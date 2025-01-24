@@ -2,7 +2,7 @@
   <div class="cart-item">
     <div class="cart-item--left">
       <img
-        :src="renderImg('products/thumb-milk.png')"
+        :src="renderImg(`products/${product.image}`)"
         alt="product-thumbnail"
       />
     </div>
@@ -10,28 +10,46 @@
     <div class="cart-item--right">
       <div class="cart-data-top">
         <div class="item-info">
-          <div class="product-title">Breville One Hand Blender</div>
+          <div class="product-title">{{ product.title }}</div>
           <div class="product-meta">
-            <div class="amount">ZK20.00</div>
+            <div class="amount">
+              <span>{{ product.currency }}</span
+              ><span>{{
+                parseFloat(product.amount.toString()).toFixed(2)
+              }}</span>
+            </div>
             <div class="dot"></div>
-            <div class="stock-status">IN STOCK</div>
+            <div class="stock-status">
+              {{ product.quantity }} UNIT{{ product.quantity > 1 ? "S" : "" }}
+              AVAILABLE
+            </div>
           </div>
         </div>
 
-        <div class="remove-action">
+        <div class="remove-action" @click="removeFromCart">
           <div class="icon icon-trash"></div>
         </div>
       </div>
 
       <div class="cart-data-bottom">
         <div class="product-quantity">
-          <div class="control">
+          <div
+            class="control"
+            :class="{ 'control-disabled': getProductQuantityInCart === 1 }"
+            @click="updateCartQuantity(-1)"
+          >
             <div class="icon icon-minus"></div>
           </div>
 
-          <div class="value">1</div>
+          <div class="value">{{ getProductQuantityInCart }}</div>
 
-          <div class="control">
+          <div
+            class="control"
+            :class="{
+              'control-disabled': getProductQuantityInCart === product.quantity,
+            }"
+            @click="updateCartQuantity(1)"
+          >
             <div class="icon icon-plus"></div>
           </div>
         </div>
@@ -41,8 +59,72 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, computed, inject } from "vue";
+import { IProductItemCart } from "@/models/product-type";
 import { useString } from "@/shared/composables/useString";
+import { useStorefrontStore } from "@/modules/template/store";
+import { storeToRefs } from "pinia";
+import { Emitter } from "mitt";
+
+interface IAlertType {
+  type: string;
+  message: string;
+  description?: string;
+}
+
+type Events = {
+  triggerToastAlert: IAlertType;
+};
+
+interface ICartDialogItem {
+  product: IProductItemCart;
+}
+
+const props = defineProps<ICartDialogItem>();
+const eventBus = inject<Emitter<Events>>("eventBus");
+
 const { renderImg } = useString();
+const { toggleProductInCart, updateProductCartQuantity } = useStorefrontStore();
+
+const getProductQuantityInCart = computed(() => {
+  return props.product?.quantityInCart ?? 1;
+});
+
+const cartQuantity = ref<number>(1);
+
+const removeFromCart = () => {
+  toggleProductInCart(props.product);
+};
+
+const pushToastAlert = (alertPayload: IAlertType | undefined) => {
+  alertPayload && eventBus?.emit("triggerToastAlert", alertPayload);
+};
+
+const updateCartQuantity = (count: number) => {
+  const minQuantity = 1;
+  const maxQuantity = props.product?.quantity ?? 1;
+
+  // HANDLE REDUCTION BELOW THE MINIMUM VALUE
+  if (count === -1 && getProductQuantityInCart.value === minQuantity) {
+    pushToastAlert({
+      type: "error",
+      message: "Minimum quantity reached!",
+      description: "Product quantity cannot go below 1 unit",
+    });
+  }
+
+  // HANDLE INCREASE ABOVE THE MAXIMUM VALUE
+  else if (count === 1 && getProductQuantityInCart.value === maxQuantity) {
+    pushToastAlert({
+      type: "error",
+      message: "Maximum quantity reached!",
+      description: `Product quantity cannot exceed ${maxQuantity} units`,
+    });
+  } else {
+    cartQuantity.value += count;
+    updateProductCartQuantity(props.product.id, cartQuantity.value);
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -106,6 +188,10 @@ const { renderImg } = useString();
           .icon {
             @apply text-sm;
           }
+        }
+
+        .control-disabled {
+          @apply bg-green-400/80 cursor-not-allowed hover:bg-green-400/80;
         }
 
         .value {

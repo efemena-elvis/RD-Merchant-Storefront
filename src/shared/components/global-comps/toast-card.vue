@@ -55,13 +55,13 @@ const closeToastAlert = () => {
 };
 
 onMounted(() => {
-  setTimeout(() => closeToastAlert(), 4000);
+  setTimeout(() => closeToastAlert(), 3000);
 });
 </script>
 
 <style lang="scss" scoped>
 .toast-card {
-  @apply fixed overflow-hidden rounded-md top-9 right-3 min-w-[auto] max-w-[45%] md:max-w-[60%] sm:max-w-[80%] xs:max-w-[94%] w-auto animate-drift-right;
+  @apply fixed overflow-hidden rounded-md top-8 right-3 min-w-[auto] max-w-[45%] md:max-w-[60%] sm:max-w-[80%] xs:max-w-[94%] w-auto animate-drift-right;
   z-index: 5999;
   filter: drop-shadow(2px 3px 3px rgba(0, 54, 27, 0.1));
 

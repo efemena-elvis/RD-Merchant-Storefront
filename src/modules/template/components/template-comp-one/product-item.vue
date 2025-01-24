@@ -7,8 +7,8 @@
         alt="product-thumbnail"
       />
 
-      <div class="favourite-container">
-        <div :class="'icon ' + renderFavouriteState"></div>
+      <div class="favourite-container" @click="toggleIsFavourite">
+        <div :class="'icon ' + isProductInWishlist"></div>
       </div>
     </div>
 
@@ -24,7 +24,7 @@
       <div class="product-meta">
         <div class="product-amount">
           <span class="mr-0.5">{{ product.currency }}</span
-          ><span>{{ product.amount }}</span>
+          ><span>{{ parseFloat(product.amount.toString()).toFixed(2) }}</span>
         </div>
 
         <div class="dot"></div>
@@ -46,7 +46,15 @@
           ><span>{{ product.amount }}</span>
         </div> -->
 
-        <div class="product-action">
+        <div
+          class="product-action product-action-disabled"
+          v-if="isProductInCart"
+        >
+          <div class="icon icon-checkmark"></div>
+          <div class="text">Added to Cart</div>
+        </div>
+
+        <div class="product-action" v-else @click="addToCart">
           <div class="icon icon-shopping-bag"></div>
           <div class="text">Add to Cart</div>
         </div>
@@ -56,27 +64,84 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, inject, toRaw } from "vue";
 import { useString } from "@/shared/composables/useString";
 import { IProductItem } from "@/models/product-type";
+import { useStorefrontStore } from "@/modules/template/store";
+import { storeToRefs } from "pinia";
+import { Emitter } from "mitt";
 
-const { renderImg } = useString();
+interface IAlertType {
+  type: string;
+  message: string;
+  description?: string;
+}
+
+type Events = {
+  triggerToastAlert: IAlertType;
+};
 
 type IProductItemData = {
   product: IProductItem;
 };
 
 const props = defineProps<IProductItemData>();
+const eventBus = inject<Emitter<Events>>("eventBus");
 
-const renderFavouriteState = computed(() => {
-  if (props.product.isFavorite) return "icon-heart-fill !text-red-400";
-  else return "icon-heart-outline";
+const { renderImg } = useString();
+
+const { getProductsInCart, getProductsInWishList } =
+  storeToRefs(useStorefrontStore());
+
+const { toggleProductInCart, toggleProductInWishlist } = useStorefrontStore();
+
+const inWishList = computed(() => {
+  return getProductsInWishList.value.some(
+    (product) => product.id === props.product.id
+  );
 });
+
+const isProductInWishlist = computed(() => {
+  return inWishList.value
+    ? "icon-heart-fill !text-red-400"
+    : "icon-heart-outline";
+});
+
+const isProductInCart = computed(() => {
+  const cartProducts = getProductsInCart.value;
+  return cartProducts.some((p) => p.id === props.product.id);
+});
+
+const pushToastAlert = (alertPayload: IAlertType | undefined) => {
+  alertPayload && eventBus?.emit("triggerToastAlert", alertPayload);
+};
+
+const toggleIsFavourite = () => {
+  pushToastAlert({
+    type: inWishList.value ? "error" : "success",
+    message: inWishList.value ? "Removed from Wishlist" : "Added to Wishlist",
+    description: inWishList.value
+      ? `${props.product.title} is out of your wishlist`
+      : `${props.product.title} is now in your wishlist`,
+  });
+
+  toggleProductInWishlist(props.product);
+};
+
+const addToCart = () => {
+  pushToastAlert({
+    type: "success",
+    message: "Added to Cart",
+    description: `${props.product.title} is now in your cart`,
+  });
+
+  toggleProductInCart(props.product);
+};
 </script>
 
 <style lang="scss" scoped>
 .product-item {
-  @apply w-full h-auto p-3.5 xl:p-2.5 md:p-1.5 border-2 border-[#f1f1f1] shadow-lg shadow-[#eeeeee] rounded-xl overflow-hidden transition duration-300 ease-in-out hover:scale-[97%];
+  @apply w-full h-auto p-3.5 xl:p-2.5 md:p-1.5 border border-[#e3e3e3] shadow-lg shadow-[#eeeeee] rounded-xl overflow-hidden transition duration-300 ease-in-out hover:scale-[97%];
 
   &--top {
     @apply relative w-full h-[230px] xl:h-[220px] md:h-[190px] xs:h-[165px] xxs:h-[220px] mb-4 xl:mb-3 bg-[#f0f0f1] rounded-lg flex justify-center items-center;
@@ -150,6 +215,10 @@ const renderFavouriteState = computed(() => {
         .text {
           @apply text-[13.75px];
         }
+      }
+
+      .product-action-disabled {
+        @apply cursor-not-allowed bg-green-500/80 hover:bg-green-500/80;
       }
     }
   }

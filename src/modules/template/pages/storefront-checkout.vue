@@ -122,8 +122,25 @@
           <CheckoutCard title="Order Summary">
             <!-- ORDER BLOCK LIST -->
             <div class="order-block">
-              <CartOrderItem />
-              <CartOrderItem />
+              <template v-if="getProductsInCart.length">
+                <CartOrderItem
+                  v-for="(product, index) in getProductsInCart"
+                  :key="index"
+                  :product="product"
+                />
+              </template>
+
+              <template v-else>
+                <div class="empty-cart">
+                  <img :src="renderImg('empty-cart.png')" alt="empty-cart" />
+
+                  <div class="title-text">Your cart is empty</div>
+
+                  <div class="description-text">
+                    Look like you haven't added anything to your cart yet.
+                  </div>
+                </div>
+              </template>
             </div>
 
             <!-- DISCOUNT BLOCK -->
@@ -135,7 +152,7 @@
                 inputPlaceholder="Provide a valid coupon code"
                 :isRequired="false"
                 :hasBottomPadding="false"
-                @inputChanged="payload.couponCode = $event"
+                @inputChanged="couponPayload.couponCode = $event"
               />
             </div>
 
@@ -144,31 +161,51 @@
               <div class="secondary-total border-b border-b-grey-200/75">
                 <div class="total-row">
                   <div class="text">Subtotal</div>
-                  <div class="value">ZK20.00</div>
+                  <div class="value">
+                    {{ getProductCurrency
+                    }}{{ parseFloat(getSubTotal.toString()).toFixed(2) }}
+                  </div>
                 </div>
 
                 <div class="total-row">
                   <div class="text">Shipping</div>
-                  <div class="value">ZK4.00</div>
+                  <div class="value">
+                    {{ getProductCurrency
+                    }}{{ parseFloat(totalShippingFee.toString()).toFixed(2) }}
+                  </div>
                 </div>
 
                 <div class="total-row">
                   <div class="text">Taxes</div>
-                  <div class="value">ZK0.00</div>
+                  <div class="value">
+                    {{ getProductCurrency
+                    }}{{ parseFloat(totalCollectedTax.toString()).toFixed(2) }}
+                  </div>
                 </div>
               </div>
 
               <div class="primary-total pt-5 pb-4">
                 <div class="total-row">
                   <div class="text font-semibold">Total</div>
-                  <div class="value">ZK24.00</div>
+                  <div class="value !text-green-600">
+                    {{ getProductCurrency
+                    }}{{
+                      parseFloat(getTotalProductAmount.toString()).toFixed(2)
+                    }}
+                  </div>
                 </div>
               </div>
             </div>
           </CheckoutCard>
 
           <!-- MAKE PAYMENT BTN -->
-          <button class="btn">Make Payment</button>
+          <button
+            class="btn"
+            :disabled="!getTotalProductAmount"
+            @click="handleMakePayment"
+          >
+            Make Payment of {{ getProductCurrency }}{{ getTotalProductAmount }}
+          </button>
         </div>
       </div>
     </div>
@@ -176,19 +213,37 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { computed, inject, onMounted, ref } from "vue";
+import { Emitter } from "mitt";
 import { IInputType } from "@/models/form-type";
+import { useString } from "@/shared/composables/useString";
 import TextFieldInput from "@/shared/components/form-comps/text-field-input.vue";
 import SelectFieldInput from "@/shared/components/form-comps/select-field-input.vue";
 import zambiaProvinceList from "@/shared/constants/zambia-provinces";
 import CheckoutCard from "@/modules/template/components/template-comp-one/checkout-card.vue";
 import CartOrderItem from "@/modules/template/components/template-comp-one/cart-order-item.vue";
+import { useStorefrontStore } from "@/modules/template/store";
+import { storeToRefs } from "pinia";
 
+type Events = {
+  hidePageLoader: void;
+  showPageLoader: void;
+};
+
+const eventBus = inject<Emitter<Events>>("eventBus");
+
+const { getProductsInCart } = storeToRefs(useStorefrontStore());
+
+const { renderImg } = useString();
 const zambianProvinces = ref([...zambiaProvinceList]);
 
-const payload = ref({
+const couponPayload = ref({
   couponCode: "",
 });
+
+const totalShippingFee = ref<number>(0);
+const totalCollectedTax = ref<number>(0);
+const totalDiscountAmount = ref<number>(0);
 
 const shippingPayload = ref({
   state: "",
@@ -209,12 +264,45 @@ const paymentMethods = ref([
   },
 ]);
 
+const getProductCurrency = computed(() => {
+  return getProductsInCart.value[0]?.currency ?? "ZK";
+});
+
+const getSubTotal = computed(() => {
+  return getProductsInCart.value.reduce(
+    (total, product) => total + product.amount * (product.quantityInCart || 1),
+    0
+  );
+});
+
+const getTotalProductAmount = computed(() => {
+  return (
+    getSubTotal.value +
+    totalShippingFee.value +
+    totalCollectedTax.value -
+    totalDiscountAmount.value
+  );
+});
+
 const toggleActivePayment = (index: number) => {
   paymentMethods.value = paymentMethods.value.map((payment, i) => ({
     ...payment,
     isActive: i === index,
   }));
 };
+
+const handleMakePayment = () => {
+  // TODO: Implement payment logic
+};
+
+onMounted(() => {
+  setTimeout(() => {
+    eventBus?.emit("hidePageLoader");
+  }, 500);
+});
+
+// SHOW PAGE LOADER BEFORE MOUNT
+eventBus?.emit("showPageLoader");
 </script>
 
 <style lang="scss" scoped>
@@ -269,6 +357,22 @@ const toggleActivePayment = (index: number) => {
 
       .order-block {
         @apply p-6 lg:p-4 w-full h-auto border-b border-b-grey-200;
+
+        .empty-cart {
+          @apply flex flex-col justify-center items-center h-full pt-6 pb-10;
+
+          img {
+            @apply w-[70px] h-auto mx-auto mb-3.5;
+          }
+
+          .title-text {
+            @apply text-base font-semibold text-grey-800 mb-1;
+          }
+
+          .description-text {
+            @apply text-sm leading-[24px] text-grey-500 w-[75%] text-center;
+          }
+        }
       }
 
       .discount-block {
@@ -292,7 +396,7 @@ const toggleActivePayment = (index: number) => {
       }
 
       .btn {
-        @apply mt-10 rounded-lg py-3 w-full bg-green-600 text-neutral-10 text-[15px] sm:text-sm font-semibold hover:bg-green-700;
+        @apply mt-10 rounded-lg py-3 w-full bg-green-600 text-neutral-10 text-[15px] sm:text-sm font-semibold hover:bg-green-700 disabled:opacity-50;
       }
     }
   }

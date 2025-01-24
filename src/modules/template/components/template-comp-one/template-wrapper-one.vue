@@ -1,22 +1,26 @@
 <template>
   <div class="template-wrapper-one">
     <!-- CATEGORY ROW -->
-    <CategoryRow />
+    <CategoryRow :productCategories="getProductCategories" />
 
     <!-- HERO BANNER -->
-    <HeroBanner />
+    <!-- <HeroBanner /> -->
 
     <!-- PRODUCT ROW (TRENDING) -->
     <!-- <ProductRow
       sectionTitle="Trending Products"
-      :productList="mockProducts.slice(0, 4)"
+      :productList="getStoreProducts.slice(0, 4)"
     /> -->
 
     <!-- PRODUCT ROW (ALL PRODUCTS) -->
-    <ProductRow sectionTitle="All Products" :productList="mockProducts" />
+    <ProductRow
+      :sectionTitle="productSectionTitle"
+      :productList="getStoreProducts"
+      :isLoading="isProductLoading"
+    />
 
     <!-- NEWSLETTER BLOCK -->
-    <NewsletterBlock />
+    <!-- <NewsletterBlock /> -->
 
     <!-- STORE PERKS -->
     <!-- <StorePerks /> -->
@@ -71,7 +75,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { inject, onMounted, ref, watch } from "vue";
+import { Emitter } from "mitt";
+import { useRoute } from "vue-router";
 import CategoryRow from "@/modules/template/components/template-comp-one/category-row.vue";
 import HeroBanner from "@/modules/template/components/template-comp-one/hero-banner.vue";
 import ProductRow from "@/modules/template/components/template-comp-one/product-row.vue";
@@ -81,8 +87,21 @@ import StorePerks from "@/modules/template/components/template-comp-one/store-pe
 import CartDialog from "@/modules/template/dialogs/template-dialog-one/cart-dialog.vue";
 import SavedDialog from "@/modules/template/dialogs/template-dialog-one/saved-dialog.vue";
 import OrdersDialog from "@/modules/template/dialogs/template-dialog-one/orders-dialog.vue";
+import { useStorefrontStore } from "@/modules/template/store";
+import { storeToRefs } from "pinia";
 
-import { mockProducts } from "@/mock-payload/mock-products";
+type Events = {
+  hidePageLoader: void;
+};
+
+const eventBus = inject<Emitter<Events>>("eventBus");
+const route = useRoute();
+
+const isProductLoading = ref<boolean>(false);
+const productSectionTitle = ref<string>("All Products");
+
+const { getProductCategories, getStoreProducts } =
+  storeToRefs(useStorefrontStore());
 
 const showCartDialog = ref<boolean>(false);
 const showSavedDialog = ref<boolean>(false);
@@ -99,6 +118,38 @@ const toggleSavedDialog = () => {
 const toggleOrdersDialog = () => {
   showOrdersDialog.value = !showOrdersDialog.value;
 };
+
+watch(
+  () => route.query,
+  (value) => {
+    // HANDLE SEARCH QUERY
+    if (value.search) {
+      productSectionTitle.value = `Search Results for "${value.search}"`;
+    }
+
+    // HANDLE CATEGORY QUERY
+    else if (value.category) {
+      productSectionTitle.value = `Category: ${getProductCategories.value.find((category) => category.slug === value.category)?.name || "All categories"}`;
+    }
+
+    // HANDLE EMPTY QUERY
+    else {
+      productSectionTitle.value = "All Products";
+    }
+
+    isProductLoading.value = true;
+
+    setTimeout(() => {
+      isProductLoading.value = false;
+    }, 1000);
+  }
+);
+
+onMounted(() => {
+  setTimeout(() => {
+    eventBus?.emit("hidePageLoader");
+  }, 1000);
+});
 </script>
 
 <style lang="scss" scoped>

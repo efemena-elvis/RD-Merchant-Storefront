@@ -4,13 +4,24 @@ export interface IProductItem {
   description: string;
   image: string;
   currency: string;
-  amount: string;
+  amount: number;
+  category: IProductCategory;
   quantity: number;
   rating: number;
-  isFavorite: boolean;
 }
 
 export interface IProductList {
   sectionTitle: string;
   productList: IProductItem[];
+  isLoading: boolean;
+}
+
+export interface IProductCategory {
+  id: number;
+  slug: string;
+  name: string;
+}
+
+export interface IProductItemCart extends IProductItem {
+  quantityInCart?: number;
 }

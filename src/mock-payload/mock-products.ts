@@ -1,4 +1,4 @@
-import { IProductItem } from "@/models/product-type";
+import { IProductItem, IProductCategory } from "@/models/product-type";
 
 export const mockProducts: IProductItem[] = [
   {
@@ -7,10 +7,14 @@ export const mockProducts: IProductItem[] = [
     description: "Description 1",
     image: "thumb-avocado.png",
     currency: "ZK",
-    amount: "9.50",
-    quantity: 1,
+    amount: 9.5,
+    category: {
+      id: 3,
+      slug: "electronics",
+      name: "Electronics",
+    },
+    quantity: 6,
     rating: 4.5,
-    isFavorite: false,
   },
   {
     id: "2",
@@ -18,10 +22,14 @@ export const mockProducts: IProductItem[] = [
     description: "Description 2",
     image: "thumb-bananas.png",
     currency: "ZK",
-    amount: "19.25",
-    quantity: 2,
+    amount: 19.25,
+    category: {
+      id: 2,
+      slug: "clothing",
+      name: "Clothing",
+    },
+    quantity: 3,
     rating: 4.5,
-    isFavorite: true,
   },
   {
     id: "3",
@@ -29,10 +37,14 @@ export const mockProducts: IProductItem[] = [
     description: "Description 3",
     image: "thumb-biscuits.png",
     currency: "ZK",
-    amount: "38.75",
-    quantity: 1,
+    amount: 38.75,
+    category: {
+      id: 4,
+      slug: "home-cleaning",
+      name: "Home & Cleaning",
+    },
+    quantity: 4,
     rating: 4.5,
-    isFavorite: false,
   },
   {
     id: "4",
@@ -40,10 +52,14 @@ export const mockProducts: IProductItem[] = [
     description: "Description 4",
     image: "thumb-cucumber.png",
     currency: "ZK",
-    amount: "48.50",
+    amount: 48.5,
+    category: {
+      id: 5,
+      slug: "furniture",
+      name: "Furniture",
+    },
     quantity: 1,
     rating: 4.5,
-    isFavorite: false,
   },
   {
     id: "5",
@@ -51,10 +67,14 @@ export const mockProducts: IProductItem[] = [
     description: "Description 5",
     image: "thumb-orange-juice.png",
     currency: "ZK",
-    amount: "68.99",
-    quantity: 1,
+    amount: 68.99,
+    category: {
+      id: 6,
+      slug: "groceries",
+      name: "Groceries",
+    },
+    quantity: 10,
     rating: 4.5,
-    isFavorite: false,
   },
   {
     id: "6",
@@ -62,10 +82,14 @@ export const mockProducts: IProductItem[] = [
     description: "Description 6",
     image: "thumb-tomatoes.png",
     currency: "ZK",
-    amount: "79.50",
-    quantity: 1,
+    amount: 79.5,
+    category: {
+      id: 7,
+      slug: "food",
+      name: "Food",
+    },
+    quantity: 5,
     rating: 4.5,
-    isFavorite: true,
   },
   {
     id: "7",
@@ -73,10 +97,14 @@ export const mockProducts: IProductItem[] = [
     description: "Description 7",
     image: "thumb-milk.png",
     currency: "ZK",
-    amount: "97.25",
-    quantity: 2,
+    amount: 97.25,
+    category: {
+      id: 3,
+      slug: "electronics",
+      name: "Electronics",
+    },
+    quantity: 12,
     rating: 4.5,
-    isFavorite: false,
   },
   {
     id: "8",
@@ -84,9 +112,13 @@ export const mockProducts: IProductItem[] = [
     description: "Description 8",
     image: "thumb-raspberries.png",
     currency: "ZK",
-    amount: "127.50",
-    quantity: 2,
+    amount: 127.5,
+    category: {
+      id: 6,
+      slug: "groceries",
+      name: "Groceries",
+    },
+    quantity: 7,
     rating: 4.5,
-    isFavorite: true,
   },
 ];

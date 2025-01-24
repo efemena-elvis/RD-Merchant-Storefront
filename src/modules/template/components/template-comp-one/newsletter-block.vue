@@ -1,8 +1,6 @@
 <template>
   <div class="app-container">
     <div class="newsletter-block">
-      <img :src="renderImg('bg-pattern.png')" alt="" class="bg-pattern" />
-
       <!-- COPY BLOCK -->
       <div class="copy-block">
         <div class="title-text">
@@ -44,18 +42,11 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { useString } from "@/shared/composables/useString";
-const { renderImg } = useString();
-</script>
+<script lang="ts" setup></script>
 
 <style lang="scss" scoped>
 .newsletter-block {
   @apply relative w-full h-auto rounded-3xl overflow-hidden bg-[#e6f3fb]/90 flex md:flex-col justify-between md:justify-center items-center py-24 lg:py-16 mdLg:py-14 sm:py-12 px-16 lg:px-12 mdLg:px-10 sm:px-5 mt-28 sm:mt-20 mb-16 sm:mb-12;
-
-  .bg-pattern {
-    @apply absolute top-0 left-0 w-full h-full object-cover;
-  }
 
   .copy-block {
     @apply w-[44%] mdLg:w-[46%] md:w-full md:mb-12 flex flex-col justify-center items-start gap-y-8 md:gap-y-6;

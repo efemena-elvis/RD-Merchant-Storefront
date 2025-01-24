@@ -2,7 +2,7 @@
   <div class="saved-item">
     <div class="saved-item--left">
       <img
-        :src="renderImg('products/thumb-bananas.png')"
+        :src="renderImg(`products/${product.image}`)"
         alt="product-thumbnail"
       />
     </div>
@@ -10,21 +10,37 @@
     <div class="saved-item--right">
       <div class="saved-data-top">
         <div class="item-info">
-          <div class="product-title">Breville One Hand Blender</div>
+          <div class="product-title">{{ product.title }}</div>
           <div class="product-meta">
-            <div class="amount">ZK20.00</div>
+            <div class="amount">
+              <span>{{ product.currency }}</span
+              ><span>{{
+                parseFloat(product.amount.toString()).toFixed(2)
+              }}</span>
+            </div>
             <div class="dot"></div>
-            <div class="stock-status">IN STOCK</div>
+            <div class="stock-status">
+              {{ product.quantity }} UNIT{{ product.quantity > 1 ? "S" : "" }}
+              AVAILABLE
+            </div>
           </div>
         </div>
 
-        <div class="remove-action">
+        <div class="remove-action" @click="removeFromWishlist">
           <div class="icon icon-trash"></div>
         </div>
       </div>
 
       <div class="saved-data-bottom">
-        <div class="product-action">
+        <div
+          class="product-action product-action-disabled"
+          v-if="isProductInCart"
+        >
+          <div class="icon icon-checkmark"></div>
+          <div class="text">Added to Cart</div>
+        </div>
+
+        <div class="product-action" v-else @click="addToCart">
           <div class="icon icon-shopping-bag"></div>
           <div class="text">Add to Cart</div>
         </div>
@@ -34,8 +50,35 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue";
+import { IProductItem } from "@/models/product-type";
 import { useString } from "@/shared/composables/useString";
+import { useStorefrontStore } from "@/modules/template/store";
+import { storeToRefs } from "pinia";
+
+interface ISavedDialogItem {
+  product: IProductItem;
+}
+
+const props = defineProps<ISavedDialogItem>();
+
 const { renderImg } = useString();
+
+const { getProductsInCart } = storeToRefs(useStorefrontStore());
+const { toggleProductInWishlist, toggleProductInCart } = useStorefrontStore();
+
+const isProductInCart = computed(() => {
+  const cartProducts = getProductsInCart.value;
+  return cartProducts.some((p) => p.id === props.product.id);
+});
+
+const removeFromWishlist = () => {
+  toggleProductInWishlist(props.product);
+};
+
+const addToCart = () => {
+  toggleProductInCart(props.product);
+};
 </script>
 
 <style lang="scss" scoped>
@@ -65,7 +108,7 @@ const { renderImg } = useString();
           @apply flex justify-start items-center gap-x-2;
 
           .amount {
-            @apply text-grey-600 font-medium text-[13px];
+            @apply text-grey-600 font-semibold text-[13px];
           }
 
           .dot {
@@ -91,7 +134,7 @@ const { renderImg } = useString();
       @apply w-full flex justify-between items-center gap-x-2;
 
       .product-action {
-        @apply flex justify-center items-center gap-x-1.5 px-4 py-1.5 rounded-full transition duration-300 ease-in-out cursor-pointer text-neutral-10 bg-green-600 hover:bg-green-700;
+        @apply flex justify-center items-center gap-x-1.5 px-4 py-1.5 rounded-full cursor-pointer transition duration-300 ease-in-out text-neutral-10 bg-green-600 hover:bg-green-700;
 
         .icon {
           @apply text-base;
@@ -100,6 +143,10 @@ const { renderImg } = useString();
         .text {
           @apply text-[13.75px] xs:text-[12.5px];
         }
+      }
+
+      .product-action-disabled {
+        @apply cursor-not-allowed bg-green-500/90 hover:bg-green-500/80;
       }
     }
   }

@@ -40,10 +40,28 @@ class ServiceApi {
   API_BASE_URL: string = constants.REDSTONE_API_URL;
   API_VERSION: string = constants.REDSTONE_API_VERSION;
 
+  // Mapping of names to base URLs
+  private baseApiUrls: { [key: string]: string } = {
+    storefront: constants.STOREFRONT_API_URL,
+  };
+
   // INSTANTIATE BASE API URL
   constructor() {
     axios.defaults.baseURL = `${this.API_BASE_URL}/${this.API_VERSION}/`;
     this.injectTokenInterceptor();
+  }
+
+  // ===============================
+  // SET BASE API URL DYNAMICALLY
+  setBaseAPI(name: string): this {
+    const baseUrl = this.baseApiUrls[name];
+
+    if (baseUrl) {
+      axios.defaults.baseURL = baseUrl;
+    } else {
+      console.warn(`Base URL for '${name}' not found. Using default base URL.`);
+    }
+    return this;
   }
 
   // ===============================

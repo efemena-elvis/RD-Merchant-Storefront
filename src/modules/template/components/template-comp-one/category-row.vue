@@ -7,35 +7,59 @@
       </div>
 
       <!-- CATEGORY LIST DROPDOWN -->
-      <div class="category-list-dropdown">
-        <select class="form-control" value="all-categories">
-          <option value="all-categories">All categories</option>
-          <option value="popular">Popular</option>
-          <option value="best-sellers">Best Sellers</option>
-          <option value="coffee">Coffee</option>
-          <option value="drinks">Drinks</option>
-          <option value="food">Food</option>
-          <option value="clothing">Clothing</option>
-        </select>
-
-        <div class="icon icon-caret-up"></div>
-      </div>
+      <CategoryDropdown :productCategories="productCategories" />
 
       <div class="category-list">
-        <div class="category-item category-item--active">All categrories</div>
-        <div class="category-item">Popular</div>
-        <div class="category-item">Best Sellers</div>
-        <div class="category-item">Coffee</div>
-        <div class="category-item">Drinks</div>
-        <div class="category-item">Food</div>
-        <div class="category-item">Clothing</div>
+        <div
+          v-for="(category, index) in productCategories"
+          :key="index"
+          class="category-item"
+          :class="{ 'category-item--active': category.slug === activeCategory }"
+          @click="handleCategoryClick(category.slug)"
+        >
+          {{ category.name }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { IProductCategory } from "@/models/product-type";
 import SearchBar from "@/modules/template/components/template-comp-one/search-bar.vue";
+import CategoryDropdown from "@/modules/template/components/template-comp-one/category-dropdown.vue";
+
+interface ICategoryProps {
+  productCategories: IProductCategory[];
+}
+
+withDefaults(defineProps<ICategoryProps>(), {
+  productCategories: () => [],
+});
+
+const route = useRoute();
+const router = useRouter();
+
+const activeCategory = ref<string>("all");
+
+const handleCategoryClick = (slug: string) => {
+  if (slug === "all") router.push({ query: {} });
+  else router.push({ query: { category: slug } });
+};
+
+watch(
+  () => route.query,
+  () => {
+    if (route.query.category) {
+      activeCategory.value = route.query.category as string;
+    } else {
+      activeCategory.value = "all";
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style lang="scss" scoped>

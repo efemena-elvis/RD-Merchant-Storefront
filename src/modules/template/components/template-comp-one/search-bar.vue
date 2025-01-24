@@ -4,13 +4,37 @@
     <input
       type="text"
       class="form-control"
+      v-model="searchPayload"
       placeholder="What are you looking for?"
       aria-label="What are you looking for?"
     />
   </div>
 </template>
 
-<script setup></script>
+<script lang="ts" setup>
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
+const route = useRoute();
+const router = useRouter();
+
+const searchPayload = ref<string>("");
+
+const searchProduct = () => {
+  router.push({ query: { search: searchPayload.value } });
+};
+
+watch(searchPayload, (value) => {
+  value ? searchProduct() : router.push({ query: {} });
+});
+
+// watch(
+//   () => route.query,
+//   (value) => {
+//     searchPayload.value = value.search || "";
+//   }
+// );
+</script>
 
 <style lang="scss" scoped>
 .search-input {

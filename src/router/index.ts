@@ -10,6 +10,7 @@ const routes = [
   ...externalRoutes,
   {
     path: "/*",
+    alias: "/:pathMatch(.*)*",
     name: "NotFoundError",
     component: () =>
       import(

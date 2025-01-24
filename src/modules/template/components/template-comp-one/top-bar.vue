@@ -34,6 +34,10 @@
 
           <!-- FAVOURITES -->
           <div class="option-item favourite" @click="toggleSavedDialog">
+            <div class="option-pill" v-if="getProductsInWishList.length">
+              {{ getProductsInWishList.length }}
+            </div>
+
             <div class="option-item--top">
               <div class="icon icon-heart-outline"></div>
             </div>
@@ -42,7 +46,9 @@
 
           <!-- CART -->
           <div class="option-item" @click="toggleCartDialog">
-            <div class="option-pill">5</div>
+            <div class="option-pill" v-if="getProductsInCart.length">
+              {{ getProductsInCart.length }}
+            </div>
 
             <div class="option-item--top">
               <div class="icon icon-shopping-bag"></div>
@@ -53,19 +59,7 @@
 
         <!-- CATEGORY OPTIONS AREA -->
         <div class="category-options">
-          <div class="category-list-dropdown">
-            <select class="form-control" value="all-categories">
-              <option value="all-categories">All categories</option>
-              <option value="popular">Popular</option>
-              <option value="best-sellers">Best Sellers</option>
-              <option value="coffee">Coffee</option>
-              <option value="drinks">Drinks</option>
-              <option value="food">Food</option>
-              <option value="clothing">Clothing</option>
-            </select>
-
-            <div class="icon icon-caret-up"></div>
-          </div>
+          <CategoryDropdown :productCategories="getProductCategories" />
         </div>
       </template>
 
@@ -99,14 +93,19 @@ import CartDialog from "@/modules/template/dialogs/template-dialog-one/cart-dial
 import SavedDialog from "@/modules/template/dialogs/template-dialog-one/saved-dialog.vue";
 import OrdersDialog from "@/modules/template/dialogs/template-dialog-one/orders-dialog.vue";
 import SearchBar from "@/modules/template/components/template-comp-one/search-bar.vue";
-
+import CategoryDropdown from "@/modules/template/components/template-comp-one/category-dropdown.vue";
+import { useStorefrontStore } from "@/modules/template/store";
 import { useString } from "@/shared/composables/useString";
+import { storeToRefs } from "pinia";
 
 const { renderImg } = useString();
 
 const route = useRoute();
 const topBarRef = ref<HTMLInputElement | null>(null);
 const showSimpleUI = ref<boolean>(false);
+
+const { getProductCategories, getProductsInCart, getProductsInWishList } =
+  storeToRefs(useStorefrontStore());
 
 const showCartDialog = ref<boolean>(false);
 const showSavedDialog = ref<boolean>(false);

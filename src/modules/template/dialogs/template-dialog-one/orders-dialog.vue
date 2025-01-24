@@ -13,25 +13,48 @@
 
     <template #modal-cover-body>
       <div class="modal-cover-body">
-        <!-- <OrderItem /> -->
+        <template v-if="cartIsLoading">
+          <CartLoadingItem v-for="(_, index) in 3" :key="index" />
+        </template>
 
-        <div
-          class="empty-cart-wrapper flex flex-col justify-center items-center h-full -mt-10"
-        >
-          <EmptyCart
-            title="Order history is empty"
-            description="No order history yet. Place an order to see your order history."
+        <template v-else-if="!cartIsLoading && getProductsInOrdersList.length">
+          <OrderItem
+            v-for="(_, index) in getProductsInOrdersList"
+            :key="index"
           />
-        </div>
+        </template>
+
+        <template v-else>
+          <div class="empty-cart-wrapper">
+            <EmptyCart
+              title="Order history is empty"
+              description="No order history yet. Place an order to see your order history."
+            />
+          </div>
+        </template>
       </div>
     </template>
   </ModalDialog>
 </template>
 
 <script lang="ts" setup>
+import { ref, onMounted } from "vue";
 import ModalDialog from "@/shared/components/global-comps/modal-dialog.vue";
 import OrderItem from "@/modules/template/dialogs/template-dialog-one/orders-dialog-item.vue";
 import EmptyCart from "@/modules/template/components/template-comp-one/empty-cart.vue";
+import CartLoadingItem from "@/modules/template/dialogs/template-dialog-one/cart-loading-item.vue";
+import { useStorefrontStore } from "@/modules/template/store";
+import { storeToRefs } from "pinia";
+
+const { getProductsInOrdersList } = storeToRefs(useStorefrontStore());
+
+const cartIsLoading = ref<boolean>(true);
+
+onMounted(() => {
+  setTimeout(() => {
+    cartIsLoading.value = false;
+  }, 1000);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -41,5 +64,9 @@ import EmptyCart from "@/modules/template/components/template-comp-one/empty-car
 
 .modal-cover-body {
   @apply h-[90%];
+
+  .empty-cart-wrapper {
+    @apply flex flex-col justify-center items-center h-full -mt-10;
+  }
 }
 </style>

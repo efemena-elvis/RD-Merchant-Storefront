@@ -3,7 +3,9 @@
     <div class="app-container">
       <!-- TOP ROW -->
       <div class="top-row">
-        <div class="top-row--title">{{ sectionTitle }}</div>
+        <div class="top-row--title" v-if="!productIsEmpty">
+          {{ sectionTitle }}
+        </div>
 
         <!-- <div class="slider-controls">
           <div class="item-slide">
@@ -17,24 +19,44 @@
       </div>
 
       <!-- PRODUCT ROW ITEMS -->
-      <div class="product-row-items" v-if="productList.length">
-        <ProductItem
-          v-for="product in productList"
-          :key="product.id"
-          :product="product"
-        />
-      </div>
+      <template v-if="isLoading">
+        <div class="product-row-items">
+          <ProductLoadingItem v-for="(_, index) in 4" :key="index" />
+        </div>
+      </template>
+
+      <template v-else-if="productList.length">
+        <div class="product-row-items">
+          <ProductItem
+            v-for="product in productList"
+            :key="product.id"
+            :product="product"
+          />
+        </div>
+      </template>
+
+      <template v-else>
+        <ProductEmptyItem />
+      </template>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue";
 import ProductItem from "@/modules/template/components/template-comp-one/product-item.vue";
+import ProductLoadingItem from "@/modules/template/components/template-comp-one/product-loading-item.vue";
+import ProductEmptyItem from "@/modules/template/components/template-comp-one/product-empty-item.vue";
 import { IProductList } from "@/models/product-type";
 
 const props = withDefaults(defineProps<IProductList>(), {
   sectionTitle: "Trending Items",
   productList: () => [],
+  isLoading: false,
+});
+
+const productIsEmpty = computed(() => {
+  return !props.productList.length && props.isLoading === false;
 });
 </script>
 
