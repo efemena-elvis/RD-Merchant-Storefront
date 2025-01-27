@@ -15,6 +15,7 @@ export interface IConstants {
   REDSTONE_API_URL: string;
   REDSTONE_API_VERSION: string;
   STOREFRONT_API_URL: string;
+  REDSTONE_STOREFRONT_TOKEN: string;
 }
 
 const constants: IConstants = {
@@ -26,6 +27,7 @@ const constants: IConstants = {
   REDSTONE_API_URL: API_BASE_URL,
   REDSTONE_API_VERSION: API_VERSION,
   STOREFRONT_API_URL: STOREFRONT_API_BASE_URL,
+  REDSTONE_STOREFRONT_TOKEN: "REDSTONE_STOREFRONT_TOKEN",
 };
 
 export default constants;

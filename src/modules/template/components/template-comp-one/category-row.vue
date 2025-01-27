@@ -86,10 +86,22 @@ watch(
     }
 
     .category-list {
-      @apply flex flex-nowrap justify-start items-center gap-x-1 mdLg:hidden;
+      @apply flex flex-nowrap justify-start items-center gap-x-1 mdLg:hidden overflow-auto w-full;
+
+      &::-webkit-scrollbar {
+        @apply h-1;
+      }
+
+      &::-webkit-scrollbar-track {
+        @apply rounded-sm;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        @apply rounded-sm bg-grey-300/45;
+      }
 
       .category-item {
-        @apply text-[14.75px] text-neutral-400 px-[18px] py-2.5 rounded-full cursor-pointer hover:text-neutral-500 hover:bg-neutral-50/30 transition duration-300 ease-in-out;
+        @apply text-[14.75px] text-nowrap select-none mb-0.5 text-neutral-400 px-[18px] py-2.5 rounded-full cursor-pointer hover:text-neutral-500 hover:bg-neutral-50/30 transition duration-300 ease-in-out;
 
         &--active {
           @apply text-neutral-10 bg-green-700 hover:text-neutral-10 hover:bg-green-700;

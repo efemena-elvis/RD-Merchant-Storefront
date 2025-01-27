@@ -3,8 +3,16 @@
     <div class="app-container">
       <!-- LOGO AREA -->
       <div class="logo-area">
-        <div class="brand-logo">
-          <img :src="renderImg('store-logo.png')" alt="brand-logo" />
+        <div
+          class="brand-logo"
+          :class="storeDetailsValidated.logo ? '' : 'opacity-45'"
+        >
+          <img
+            :src="
+              storeDetailsValidated.logo || renderImg('logo-placeholder.png')
+            "
+            :alt="storeDetailsValidated.name"
+          />
         </div>
       </div>
 
@@ -87,7 +95,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useRoute } from "vue-router";
 import CartDialog from "@/modules/template/dialogs/template-dialog-one/cart-dialog.vue";
 import SavedDialog from "@/modules/template/dialogs/template-dialog-one/saved-dialog.vue";
@@ -104,8 +112,23 @@ const route = useRoute();
 const topBarRef = ref<HTMLInputElement | null>(null);
 const showSimpleUI = ref<boolean>(false);
 
-const { getProductCategories, getProductsInCart, getProductsInWishList } =
-  storeToRefs(useStorefrontStore());
+const {
+  getStoreDetails,
+  getProductCategories,
+  getProductsInCart,
+  getProductsInWishList,
+} = storeToRefs(useStorefrontStore());
+
+const storeDetailsValidated = computed(() => {
+  if (!getStoreDetails.value) {
+    return {
+      name: "Store Name",
+      logo: "",
+    };
+  }
+
+  return getStoreDetails.value;
+});
 
 const showCartDialog = ref<boolean>(false);
 const showSavedDialog = ref<boolean>(false);

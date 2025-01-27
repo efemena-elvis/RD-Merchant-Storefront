@@ -3,51 +3,81 @@
     <!-- FOOTER TOP -->
     <div class="footer-top">
       <div class="app-container">
-        <div class="footer-top--left">
+        <div
+          class="footer-top--left"
+          :class="storeDetailsValidated.logo ? '' : 'opacity-45'"
+        >
           <!-- BRAND LOGO -->
-          <img :src="renderImg('store-logo.png')" alt="" class="brand-logo" />
+          <img
+            :src="
+              storeDetailsValidated.logo || renderImg('logo-placeholder.png')
+            "
+            :alt="storeDetailsValidated.name"
+            class="brand-logo"
+          />
         </div>
 
         <div class="footer-top--right">
-          <router-link to="" class="social-wrapper">
+          <a
+            :href="`https://instagram.com/${storeDetailsValidated.instagram}`"
+            target="_blank"
+            class="social-wrapper"
+            v-if="storeDetailsValidated.instagram"
+          >
             <img
               :src="renderImg('socials/instagram.png')"
               alt="instagram-icon"
               class="social-icon"
             />
-          </router-link>
+          </a>
 
+          <!-- 
           <router-link to="" class="social-wrapper">
             <img
               :src="renderImg('socials/whatsapp.png')"
               alt="whatsapp-icon"
               class="social-icon"
             />
-          </router-link>
+          </router-link> -->
 
-          <router-link to="" class="social-wrapper">
+          <a
+            :href="`https://facebook.com/${storeDetailsValidated.facebook}`"
+            target="_blank"
+            class="social-wrapper"
+            v-if="storeDetailsValidated.facebook"
+          >
             <img
               :src="renderImg('socials/facebook.png')"
               alt="facebook-icon"
               class="social-icon"
             />
-          </router-link>
+          </a>
 
-          <router-link to="" class="social-wrapper">
+          <a
+            :href="`https://tiktok.com/${storeDetailsValidated.tikTok}`"
+            target="_blank"
+            class="social-wrapper"
+            v-if="storeDetailsValidated.tikTok"
+          >
             <img
               :src="renderImg('socials/tik-tok.png')"
               alt="tiktok-icon"
               class="social-icon"
             />
-          </router-link>
+          </a>
 
-          <router-link to="" class="social-wrapper">
+          <a
+            :href="`https://twitter.com/${storeDetailsValidated.twitter}`"
+            target="_blank"
+            class="social-wrapper"
+            v-if="storeDetailsValidated.twitter"
+          >
             <img
               :src="renderImg('socials/twitter.png')"
               alt="twitter-icon"
               class="social-icon"
             />
-          </router-link>
+          </a>
         </div>
       </div>
     </div>
@@ -56,12 +86,13 @@
     <div class="footer-bottom">
       <div class="app-container">
         <div class="footer-bottom--left">
-          &copy; 2025 Foodmart. All rights reserved.
+          &copy; 2025 {{ storeDetailsValidated.name ?? "Store Name" }}. All
+          rights reserved.
         </div>
 
         <div class="footer-bottom--right">
           Storefront powered and developed by
-          <router-link to="">Redstone</router-link>
+          <a href="https://redstonepgs.com/" target="_blank">Redstone</a>
         </div>
       </div>
     </div>
@@ -69,9 +100,32 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue";
+import { useStorefrontStore } from "@/modules/template/store";
 import { useString } from "@/shared/composables/useString";
+import { storeToRefs } from "pinia";
 
 const { renderImg } = useString();
+
+const { getStoreDetails } = storeToRefs(useStorefrontStore());
+
+const storeDetailsValidated = computed(() => {
+  if (!getStoreDetails.value) {
+    return {
+      name: "Store Name",
+      logo: "",
+      phone_number: "",
+      email: "",
+      address: "",
+      facebook: "",
+      instagram: "",
+      tikTok: "",
+      twitter: "",
+    };
+  }
+
+  return getStoreDetails.value;
+});
 </script>
 
 <style lang="scss" scoped>

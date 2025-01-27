@@ -2,10 +2,7 @@
   <div class="product-item">
     <!-- PRODUCT ITEM TOP -->
     <div class="product-item--top">
-      <img
-        :src="renderImg(`products/${product.image}`)"
-        alt="product-thumbnail"
-      />
+      <img :src="product.image" :alt="product.name" />
 
       <div class="favourite-container" @click="toggleIsFavourite">
         <div :class="'icon ' + isProductInWishlist"></div>
@@ -16,21 +13,25 @@
     <div class="product-item--bottom">
       <div class="title-container">
         <div class="product-title">
-          {{ product.title }}
+          {{ product.name }}
+        </div>
+
+        <div class="product-category">
+          {{ product.category }}
         </div>
       </div>
 
       <!-- PRODUCT META -->
       <div class="product-meta">
         <div class="product-amount">
-          <span class="mr-0.5">{{ product.currency }}</span
-          ><span>{{ parseFloat(product.amount.toString()).toFixed(2) }}</span>
+          <span class="mr-0.5">ZK</span
+          ><span>{{ formatNumber(product.amount) }}</span>
         </div>
 
         <div class="dot"></div>
 
         <div class="product-unit">
-          {{ product.quantity }} UNIT{{ product.quantity > 1 ? "S" : "" }}
+          {{ product.stock }} UNIT{{ product.stock > 1 ? "S" : "" }}
         </div>
 
         <!-- <div class="product-rating">
@@ -88,7 +89,7 @@ type IProductItemData = {
 const props = defineProps<IProductItemData>();
 const eventBus = inject<Emitter<Events>>("eventBus");
 
-const { renderImg } = useString();
+const { formatNumber } = useString();
 
 const { getProductsInCart, getProductsInWishList } =
   storeToRefs(useStorefrontStore());
@@ -121,8 +122,8 @@ const toggleIsFavourite = () => {
     type: inWishList.value ? "error" : "success",
     message: inWishList.value ? "Removed from Wishlist" : "Added to Wishlist",
     description: inWishList.value
-      ? `${props.product.title} is out of your wishlist`
-      : `${props.product.title} is now in your wishlist`,
+      ? `${props.product.name} is out of your wishlist`
+      : `${props.product.name} is now in your wishlist`,
   });
 
   toggleProductInWishlist(props.product);
@@ -132,7 +133,7 @@ const addToCart = () => {
   pushToastAlert({
     type: "success",
     message: "Added to Cart",
-    description: `${props.product.title} is now in your cart`,
+    description: `${props.product.name} is now in your cart`,
   });
 
   toggleProductInCart(props.product);
@@ -163,10 +164,14 @@ const addToCart = () => {
     @apply w-full h-auto xl:px-1 xl:pb-1;
 
     .title-container {
-      @apply w-full h-[45px] mb-2;
+      @apply w-full h-auto mb-4;
 
       .product-title {
-        @apply text-[15px] sm:text-[14px] text-neutral-500 font-medium line-clamp-2;
+        @apply text-[15.5px] sm:text-[14px] text-neutral-500 font-medium line-clamp-1 text-ellipsis text-nowrap;
+      }
+
+      .product-category {
+        @apply text-[13px] text-grey-500 mt-0.5;
       }
     }
 
@@ -174,7 +179,7 @@ const addToCart = () => {
       @apply flex justify-start items-center gap-x-2.5 mb-5;
 
       .product-amount {
-        @apply text-[17px] sm:text-[15.5px] text-neutral-600 font-semibold;
+        @apply text-base sm:text-[15.5px] text-neutral-600 font-semibold;
       }
 
       .dot {
@@ -182,7 +187,7 @@ const addToCart = () => {
       }
 
       .product-unit {
-        @apply text-[13.75px] sm:text-[13.25px] text-grey-500/90;
+        @apply text-[13.75px] sm:text-[13.25px] text-grey-500;
       }
 
       // .product-rating {
@@ -206,7 +211,7 @@ const addToCart = () => {
       // }
 
       .product-action {
-        @apply w-full flex justify-center items-center gap-x-1.5 px-3.5 py-2 rounded-full transition duration-300 ease-in-out cursor-pointer text-neutral-10 bg-green-600 hover:bg-green-700;
+        @apply w-full flex justify-center items-center gap-x-1.5 px-3.5 py-2 rounded-[20px] transition duration-300 ease-in-out cursor-pointer text-neutral-10 bg-green-600 hover:bg-green-700;
 
         .icon {
           @apply text-lg;

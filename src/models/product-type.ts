@@ -1,13 +1,14 @@
 export interface IProductItem {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  currency: string;
   amount: number;
-  category: IProductCategory;
-  quantity: number;
-  rating: number;
+  category: string;
+  created_at: string;
+  description: string;
+  id: string;
+  image: string;
+  name: string;
+  stock: number;
+  store_id: string;
+  updated_at: string;
 }
 
 export interface IProductList {

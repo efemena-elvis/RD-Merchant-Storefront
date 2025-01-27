@@ -39,6 +39,8 @@ interface IAPIKeys {
 class ServiceApi {
   API_BASE_URL: string = constants.REDSTONE_API_URL;
   API_VERSION: string = constants.REDSTONE_API_VERSION;
+  private initialBaseURL: string = `${this.API_BASE_URL}/${this.API_VERSION}/`;
+  private customBaseURL: string | null = null;
 
   // Mapping of names to base URLs
   private baseApiUrls: { [key: string]: string } = {
@@ -47,7 +49,7 @@ class ServiceApi {
 
   // INSTANTIATE BASE API URL
   constructor() {
-    axios.defaults.baseURL = `${this.API_BASE_URL}/${this.API_VERSION}/`;
+    axios.defaults.baseURL = this.initialBaseURL;
     this.injectTokenInterceptor();
   }
 
@@ -57,7 +59,7 @@ class ServiceApi {
     const baseUrl = this.baseApiUrls[name];
 
     if (baseUrl) {
-      axios.defaults.baseURL = baseUrl;
+      this.customBaseURL = baseUrl;
     } else {
       console.warn(`Base URL for '${name}' not found. Using default base URL.`);
     }
@@ -83,12 +85,24 @@ class ServiceApi {
     const hashed_url = urlHash(url);
 
     try {
+      if (this.customBaseURL) {
+        axios.defaults.baseURL = this.customBaseURL;
+      }
+
       const response = await axios.get<T>(
         hashed_url,
         this.getHeaders(option.is_attach, option.requiresPublicKey)
       );
+
+      // Reset to initial base URL after the request
+      axios.defaults.baseURL = this.initialBaseURL;
+      this.customBaseURL = null;
+
       return option.resolve ? response.data : response;
     } catch (err) {
+      // Reset to initial base URL in case of error
+      axios.defaults.baseURL = this.initialBaseURL;
+      this.customBaseURL = null;
       return this.handleErrors(err);
     }
   }
@@ -121,14 +135,25 @@ class ServiceApi {
     }
   ): Promise<T | AxiosResponse<T>> {
     try {
+      if (this.customBaseURL) {
+        axios.defaults.baseURL = this.customBaseURL;
+      }
+
       const response = await axios.post<T>(
         url,
         payload,
         this.getHeaders(is_attach, requiresPublicKey)
       );
 
+      // Reset to initial base URL after the request
+      axios.defaults.baseURL = this.initialBaseURL;
+      this.customBaseURL = null;
+
       return resolve ? response.data : response;
     } catch (err) {
+      // Reset to initial base URL in case of error
+      axios.defaults.baseURL = this.initialBaseURL;
+      this.customBaseURL = null;
       return this.handleErrors(err);
     }
   }
@@ -150,13 +175,25 @@ class ServiceApi {
     }
   ): Promise<T | AxiosResponse<T>> {
     try {
+      if (this.customBaseURL) {
+        axios.defaults.baseURL = this.customBaseURL;
+      }
+
       const response = await axios.put<T>(
         url,
         payload,
         this.getHeaders(is_attach, requiresPublicKey)
       );
+
+      // Reset to initial base URL after the request
+      axios.defaults.baseURL = this.initialBaseURL;
+      this.customBaseURL = null;
+
       return resolve ? response.data : response;
     } catch (err) {
+      // Reset to initial base URL in case of error
+      axios.defaults.baseURL = this.initialBaseURL;
+      this.customBaseURL = null;
       return this.handleErrors(err);
     }
   }
@@ -178,13 +215,25 @@ class ServiceApi {
     }
   ): Promise<T | AxiosResponse<T>> {
     try {
+      if (this.customBaseURL) {
+        axios.defaults.baseURL = this.customBaseURL;
+      }
+
       const response = await axios.patch<T>(
         url,
         payload,
         this.getHeaders(is_attach, requiresPublicKey)
       );
+
+      // Reset to initial base URL after the request
+      axios.defaults.baseURL = this.initialBaseURL;
+      this.customBaseURL = null;
+
       return resolve ? response.data : response;
     } catch (err) {
+      // Reset to initial base URL in case of error
+      axios.defaults.baseURL = this.initialBaseURL;
+      this.customBaseURL = null;
       return this.handleErrors(err);
     }
   }
@@ -199,13 +248,24 @@ class ServiceApi {
     }
   ): Promise<T | AxiosResponse<T>> {
     try {
+      if (this.customBaseURL) {
+        axios.defaults.baseURL = this.customBaseURL;
+      }
+
       const response = await axios.delete<T>(url, {
         data: option.payload,
         ...this.getHeaders(),
       });
 
+      // Reset to initial base URL after the request
+      axios.defaults.baseURL = this.initialBaseURL;
+      this.customBaseURL = null;
+
       return option.resolve ? response.data : response;
     } catch (err) {
+      // Reset to initial base URL in case of error
+      axios.defaults.baseURL = this.initialBaseURL;
+      this.customBaseURL = null;
       return this.handleErrors(err);
     }
   }

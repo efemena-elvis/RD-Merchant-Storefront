@@ -75,9 +75,10 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, onMounted, ref, watch } from "vue";
+import { inject, ref, watch } from "vue";
 import { Emitter } from "mitt";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import useEvents from "@/shared/composables/useEvents";
 import CategoryRow from "@/modules/template/components/template-comp-one/category-row.vue";
 import HeroBanner from "@/modules/template/components/template-comp-one/hero-banner.vue";
 import ProductRow from "@/modules/template/components/template-comp-one/product-row.vue";
@@ -92,16 +93,23 @@ import { storeToRefs } from "pinia";
 
 type Events = {
   hidePageLoader: void;
+  showPageLoader: void;
 };
 
 const eventBus = inject<Emitter<Events>>("eventBus");
-const route = useRoute();
 
-const isProductLoading = ref<boolean>(false);
+const route = useRoute();
+const router = useRouter();
+
+const { processAPIRequest } = useEvents();
+
+const isProductLoading = ref<boolean>(true);
 const productSectionTitle = ref<string>("All Products");
 
 const { getProductCategories, getStoreProducts } =
   storeToRefs(useStorefrontStore());
+
+const { getStorefrontBySlug, getStorefrontProducts } = useStorefrontStore();
 
 const showCartDialog = ref<boolean>(false);
 const showSavedDialog = ref<boolean>(false);
@@ -145,11 +153,40 @@ watch(
   }
 );
 
-onMounted(() => {
-  setTimeout(() => {
+const fetchAllStorefrontProducts = async () => {
+  isProductLoading.value = true;
+
+  const response = await processAPIRequest({
+    action: getStorefrontProducts,
+    payload: { storefrontSlug: route.params.storefrontName },
+    showAlert: false,
+  });
+
+  if (response.code === 200) {
+    isProductLoading.value = false;
+  }
+};
+
+// FETCH STOREFRONT DETAILS
+const fetchStorefrontDetails = async () => {
+  eventBus?.emit("showPageLoader");
+
+  const response = await processAPIRequest({
+    action: getStorefrontBySlug,
+    payload: { storefrontSlug: route.params.storefrontName },
+    showAlert: false,
+  });
+
+  if (response.code === 200) {
+    fetchAllStorefrontProducts();
     eventBus?.emit("hidePageLoader");
-  }, 1000);
-});
+  }
+
+  // REDIRECT_TO_AN ERROR_PAGE
+  else router.push({ path: "/" });
+};
+
+fetchStorefrontDetails();
 </script>
 
 <style lang="scss" scoped>

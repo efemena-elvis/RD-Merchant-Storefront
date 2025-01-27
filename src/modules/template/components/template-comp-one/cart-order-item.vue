@@ -1,20 +1,17 @@
 <template>
   <div class="cart-order-item">
     <div class="cart-order-item--left">
-      <img
-        :src="renderImg(`products/${product.image}`)"
-        alt="product-thumbnail"
-      />
+      <img :src="product.image" :alt="product.name" />
     </div>
 
     <div class="cart-order-item--right">
       <div class="cart-order-info">
-        <div class="info-top">{{ product.title }}</div>
+        <div class="info-top">{{ product.name }}</div>
 
         <div class="info-bottom">
           <div class="product-amount">
-            <span>{{ product.currency }}</span
-            ><span>{{ parseFloat(product.amount.toString()).toFixed(2) }}</span>
+            <span class="mr-0.5">ZK</span
+            ><span>{{ formatNumber(product.amount) }}</span>
           </div>
           <div class="multiplier">x</div>
           <div class="product-unit">
@@ -26,11 +23,9 @@
       </div>
 
       <div class="cart-order-amount">
-        <span>{{ product.currency }}</span
+        <span class="mr-0.5">ZK</span
         ><span>{{
-          parseFloat(
-            (product.amount * (product.quantityInCart || 1)).toString()
-          ).toFixed(2)
+          formatNumber(product.amount * (product.quantityInCart || 1))
         }}</span>
       </div>
     </div>
@@ -45,9 +40,9 @@ interface ICartDialogItem {
   product: IProductItemCart;
 }
 
-const { renderImg } = useString();
-
 defineProps<ICartDialogItem>();
+
+const { formatNumber } = useString();
 </script>
 
 <style lang="scss" scoped>

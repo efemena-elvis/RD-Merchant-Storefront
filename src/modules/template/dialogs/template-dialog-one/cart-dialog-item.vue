@@ -1,26 +1,21 @@
 <template>
   <div class="cart-item">
     <div class="cart-item--left">
-      <img
-        :src="renderImg(`products/${product.image}`)"
-        alt="product-thumbnail"
-      />
+      <img :src="product.image" :alt="product.name" />
     </div>
 
     <div class="cart-item--right">
       <div class="cart-data-top">
         <div class="item-info">
-          <div class="product-title">{{ product.title }}</div>
+          <div class="product-title">{{ product.name }}</div>
           <div class="product-meta">
             <div class="amount">
-              <span>{{ product.currency }}</span
-              ><span>{{
-                parseFloat(product.amount.toString()).toFixed(2)
-              }}</span>
+              <span class="mr-0.5">ZK</span
+              ><span>{{ formatNumber(product.amount) }}</span>
             </div>
             <div class="dot"></div>
             <div class="stock-status">
-              {{ product.quantity }} UNIT{{ product.quantity > 1 ? "S" : "" }}
+              {{ product.stock }} UNIT{{ product.stock > 1 ? "S" : "" }}
               AVAILABLE
             </div>
           </div>
@@ -46,7 +41,7 @@
           <div
             class="control"
             :class="{
-              'control-disabled': getProductQuantityInCart === product.quantity,
+              'control-disabled': getProductQuantityInCart === product.stock,
             }"
             @click="updateCartQuantity(1)"
           >
@@ -61,9 +56,8 @@
 <script lang="ts" setup>
 import { ref, computed, inject } from "vue";
 import { IProductItemCart } from "@/models/product-type";
-import { useString } from "@/shared/composables/useString";
 import { useStorefrontStore } from "@/modules/template/store";
-import { storeToRefs } from "pinia";
+import { useString } from "@/shared/composables/useString";
 import { Emitter } from "mitt";
 
 interface IAlertType {
@@ -83,7 +77,8 @@ interface ICartDialogItem {
 const props = defineProps<ICartDialogItem>();
 const eventBus = inject<Emitter<Events>>("eventBus");
 
-const { renderImg } = useString();
+const { formatNumber } = useString();
+
 const { toggleProductInCart, updateProductCartQuantity } = useStorefrontStore();
 
 const getProductQuantityInCart = computed(() => {
@@ -102,7 +97,7 @@ const pushToastAlert = (alertPayload: IAlertType | undefined) => {
 
 const updateCartQuantity = (count: number) => {
   const minQuantity = 1;
-  const maxQuantity = props.product?.quantity ?? 1;
+  const maxQuantity = props.product?.stock ?? 1;
 
   // HANDLE REDUCTION BELOW THE MINIMUM VALUE
   if (count === -1 && getProductQuantityInCart.value === minQuantity) {

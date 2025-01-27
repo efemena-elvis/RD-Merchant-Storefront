@@ -44,6 +44,7 @@
           class="btn btn-md"
           v-if="getProductsInCart.length"
         >
+          <div class="icon-shopping-cart text-lg"></div>
           Proceed to Checkout
         </button>
       </div>
@@ -97,7 +98,7 @@ onMounted(() => {
   @apply absolute bottom-0 left-0 right-0 py-6 sm:py-4 bg-white;
 
   .btn {
-    @apply rounded-lg py-3 w-full bg-green-600 text-neutral-10 text-[15px] sm:text-sm hover:bg-green-700;
+    @apply rounded-lg py-3 w-full bg-green-600 text-neutral-10 text-[14.75px] sm:text-sm hover:bg-green-700 font-normal;
   }
 }
 </style>

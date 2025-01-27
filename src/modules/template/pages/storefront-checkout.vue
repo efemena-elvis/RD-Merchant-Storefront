@@ -162,24 +162,24 @@
                 <div class="total-row">
                   <div class="text">Subtotal</div>
                   <div class="value">
-                    {{ getProductCurrency
-                    }}{{ parseFloat(getSubTotal.toString()).toFixed(2) }}
+                    <span class="mr-0.5">{{ getProductCurrency }}</span
+                    ><span>{{ formatNumber(getSubTotal) }}</span>
                   </div>
                 </div>
 
                 <div class="total-row">
                   <div class="text">Shipping</div>
                   <div class="value">
-                    {{ getProductCurrency
-                    }}{{ parseFloat(totalShippingFee.toString()).toFixed(2) }}
+                    <span class="mr-0.5">{{ getProductCurrency }}</span
+                    ><span>{{ formatNumber(totalShippingFee) }}</span>
                   </div>
                 </div>
 
                 <div class="total-row">
                   <div class="text">Taxes</div>
                   <div class="value">
-                    {{ getProductCurrency
-                    }}{{ parseFloat(totalCollectedTax.toString()).toFixed(2) }}
+                    <span class="mr-0.5">{{ getProductCurrency }}</span
+                    ><span>{{ formatNumber(totalCollectedTax) }}</span>
                   </div>
                 </div>
               </div>
@@ -188,10 +188,8 @@
                 <div class="total-row">
                   <div class="text font-semibold">Total</div>
                   <div class="value !text-green-600">
-                    {{ getProductCurrency
-                    }}{{
-                      parseFloat(getTotalProductAmount.toString()).toFixed(2)
-                    }}
+                    <span class="mr-0.5">{{ getProductCurrency }}</span
+                    ><span>{{ formatNumber(getTotalProductAmount) }}</span>
                   </div>
                 </div>
               </div>
@@ -204,7 +202,7 @@
             :disabled="!getTotalProductAmount"
             @click="handleMakePayment"
           >
-            Make Payment of {{ getProductCurrency }}{{ getTotalProductAmount }}
+            Make Payment
           </button>
         </div>
       </div>
@@ -234,7 +232,7 @@ const eventBus = inject<Emitter<Events>>("eventBus");
 
 const { getProductsInCart } = storeToRefs(useStorefrontStore());
 
-const { renderImg } = useString();
+const { renderImg, formatNumber } = useString();
 const zambianProvinces = ref([...zambiaProvinceList]);
 
 const couponPayload = ref({

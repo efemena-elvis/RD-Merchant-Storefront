@@ -1,26 +1,20 @@
 <template>
   <div class="saved-item">
     <div class="saved-item--left">
-      <img
-        :src="renderImg(`products/${product.image}`)"
-        alt="product-thumbnail"
-      />
+      <img :src="product.image" :alt="product.name" />
     </div>
 
     <div class="saved-item--right">
       <div class="saved-data-top">
         <div class="item-info">
-          <div class="product-title">{{ product.title }}</div>
+          <div class="product-title">{{ product.name }}</div>
           <div class="product-meta">
             <div class="amount">
-              <span>{{ product.currency }}</span
-              ><span>{{
-                parseFloat(product.amount.toString()).toFixed(2)
-              }}</span>
+              <span>ZMW</span><span>{{ formatNumber(product.amount) }}</span>
             </div>
             <div class="dot"></div>
             <div class="stock-status">
-              {{ product.quantity }} UNIT{{ product.quantity > 1 ? "S" : "" }}
+              {{ product.stock }} UNIT{{ product.stock > 1 ? "S" : "" }}
               AVAILABLE
             </div>
           </div>
@@ -62,10 +56,10 @@ interface ISavedDialogItem {
 
 const props = defineProps<ISavedDialogItem>();
 
-const { renderImg } = useString();
-
 const { getProductsInCart } = storeToRefs(useStorefrontStore());
 const { toggleProductInWishlist, toggleProductInCart } = useStorefrontStore();
+
+const { formatNumber } = useString();
 
 const isProductInCart = computed(() => {
   const cartProducts = getProductsInCart.value;
