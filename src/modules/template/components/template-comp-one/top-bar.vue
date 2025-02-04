@@ -25,12 +25,12 @@
         <!-- OPTIONS AREA -->
         <div class="options-area">
           <!-- ACCOUNT -->
-          <div class="option-item">
+          <!-- <div class="option-item">
             <div class="option-item--top">
               <div class="icon icon-user"></div>
             </div>
             <div class="option-item--bottom">Account</div>
-          </div>
+          </div> -->
 
           <!-- ORDERS -->
           <div class="option-item" @click="toggleOrdersDialog">
@@ -72,7 +72,7 @@
       </template>
 
       <template v-if="showSimpleUI">
-        <div class="back-button" @click="$router.back()">
+        <div class="back-button" @click="navigateToStorefront">
           <div class="icon icon-arrow-left"></div>
           <div class="text xs:hidden">Back to Storefront</div>
           <div class="text hidden xs:block">Storefront</div>
@@ -96,7 +96,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import CartDialog from "@/modules/template/dialogs/template-dialog-one/cart-dialog.vue";
 import SavedDialog from "@/modules/template/dialogs/template-dialog-one/saved-dialog.vue";
 import OrdersDialog from "@/modules/template/dialogs/template-dialog-one/orders-dialog.vue";
@@ -105,10 +105,13 @@ import CategoryDropdown from "@/modules/template/components/template-comp-one/ca
 import { useStorefrontStore } from "@/modules/template/store";
 import { useString } from "@/shared/composables/useString";
 import { storeToRefs } from "pinia";
+import { storeDetails } from "../../store/state";
 
 const { renderImg } = useString();
 
 const route = useRoute();
+const router = useRouter();
+
 const topBarRef = ref<HTMLInputElement | null>(null);
 const showSimpleUI = ref<boolean>(false);
 
@@ -124,6 +127,7 @@ const storeDetailsValidated = computed(() => {
     return {
       name: "Store Name",
       logo: "",
+      slug: "",
     };
   }
 
@@ -147,8 +151,15 @@ const toggleOrdersDialog = () => {
 };
 
 const getRoutePath = () => {
-  const simpleUIRoutes = ["/store-checkout", "/auth"];
+  const simpleUIRoutes = [
+    `/${storeDetails.value?.slug}/store-checkout`,
+    `/${storeDetails.value?.slug}/checkout-success`,
+  ];
   showSimpleUI.value = simpleUIRoutes.includes(route.path);
+};
+
+const navigateToStorefront = () => {
+  router.push(`/${storeDetails.value?.slug}`);
 };
 
 watch(route, () => getRoutePath(), { immediate: true });

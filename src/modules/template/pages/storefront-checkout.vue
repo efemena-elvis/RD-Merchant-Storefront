@@ -14,6 +14,10 @@
                   inputPlaceholder="Enter your first name"
                   :isRequired="true"
                   :hasBottomPadding="false"
+                  @inputChanged="checkoutPayload.firstName = $event"
+                  :errorHandler="{
+                    validator: 'validateSingleName',
+                  }"
                 />
 
                 <TextFieldInput
@@ -23,6 +27,10 @@
                   inputPlaceholder="Enter your last name"
                   :isRequired="true"
                   :hasBottomPadding="false"
+                  @inputChanged="checkoutPayload.lastName = $event"
+                  :errorHandler="{
+                    validator: 'validateSingleName',
+                  }"
                 />
 
                 <TextFieldInput
@@ -32,15 +40,25 @@
                   inputPlaceholder="Enter your email address"
                   :isRequired="true"
                   :hasBottomPadding="false"
+                  @inputChanged="checkoutPayload.email = $event"
+                  :errorHandler="{
+                    validator: 'validateEmail',
+                  }"
                 />
 
-                <TextFieldInput
+                <PhoneFieldInput
                   labelId="phoneNumber"
                   labelTitle="Phone Number"
-                  :inputType="IInputType.Text"
-                  inputPlaceholder="Enter your phone number"
+                  :inputValue="checkoutPayload.phoneNumber"
+                  inputPlaceholder="Provide your phone number"
                   :isRequired="true"
+                  :activeCountryCode="phoneCountryCode"
                   :hasBottomPadding="false"
+                  @countryCodeChanged="phoneCountryCode = $event"
+                  @inputChanged="checkoutPayload.phoneNumber = $event"
+                  :errorHandler="{
+                    validator: 'validatePhone',
+                  }"
                 />
               </div>
             </div>
@@ -57,6 +75,10 @@
                   :isTextArea="true"
                   :isRequired="true"
                   :hasBottomPadding="false"
+                  @inputChanged="checkoutPayload.addressLine1 = $event"
+                  :errorHandler="{
+                    validator: 'validateRequired',
+                  }"
                 />
 
                 <TextFieldInput
@@ -67,6 +89,7 @@
                   :isTextArea="true"
                   :isRequired="false"
                   :hasBottomPadding="false"
+                  @inputChanged="checkoutPayload.addressLine2 = $event"
                 />
 
                 <SelectFieldInput
@@ -77,7 +100,7 @@
                   :selectData="zambianProvinces"
                   isRequired
                   :hasBottomPadding="false"
-                  @onSelectionChange="shippingPayload.state = $event"
+                  @onSelectionChange="checkoutPayload.state = $event"
                 />
 
                 <TextFieldInput
@@ -87,6 +110,10 @@
                   inputPlaceholder="Enter your postal code"
                   :isRequired="true"
                   :hasBottomPadding="false"
+                  @inputChanged="checkoutPayload.postalCode = $event"
+                  :errorHandler="{
+                    validator: 'validateRequired',
+                  }"
                 />
               </div>
             </div>
@@ -167,16 +194,16 @@
                   </div>
                 </div>
 
-                <div class="total-row">
+                <!-- <div class="total-row">
                   <div class="text">Shipping</div>
                   <div class="value">
                     <span class="mr-0.5">{{ getProductCurrency }}</span
                     ><span>{{ formatNumber(totalShippingFee) }}</span>
                   </div>
-                </div>
+                </div> -->
 
                 <div class="total-row">
-                  <div class="text">Taxes</div>
+                  <div class="text">Total VAT</div>
                   <div class="value">
                     <span class="mr-0.5">{{ getProductCurrency }}</span
                     ><span>{{ formatNumber(totalCollectedTax) }}</span>
@@ -199,7 +226,7 @@
           <!-- MAKE PAYMENT BTN -->
           <button
             class="btn"
-            :disabled="!getTotalProductAmount"
+            :disabled="isActionReady"
             @click="handleMakePayment"
           >
             Make Payment
@@ -215,13 +242,17 @@ import { computed, inject, onMounted, ref } from "vue";
 import { Emitter } from "mitt";
 import { IInputType } from "@/models/form-type";
 import { useString } from "@/shared/composables/useString";
+import useEvents from "@/shared/composables/useEvents";
 import TextFieldInput from "@/shared/components/form-comps/text-field-input.vue";
+import PhoneFieldInput from "@/shared/components/form-comps/phone-field-input.vue";
 import SelectFieldInput from "@/shared/components/form-comps/select-field-input.vue";
 import zambiaProvinceList from "@/shared/constants/zambia-provinces";
 import CheckoutCard from "@/modules/template/components/template-comp-one/checkout-card.vue";
 import CartOrderItem from "@/modules/template/components/template-comp-one/cart-order-item.vue";
+import { useStorage } from "@/shared/composables/useStorage";
 import { useStorefrontStore } from "@/modules/template/store";
 import { storeToRefs } from "pinia";
+import { v4 as uuidv4 } from "uuid";
 
 type Events = {
   hidePageLoader: void;
@@ -230,10 +261,31 @@ type Events = {
 
 const eventBus = inject<Emitter<Events>>("eventBus");
 
-const { getProductsInCart } = storeToRefs(useStorefrontStore());
+const { processAPIRequest, pushToastAlert } = useEvents();
+const { setStorage, removeStorage } = useStorage();
 
-const { renderImg, formatNumber } = useString();
+const { getStoreDetails, getProductsInCart } =
+  storeToRefs(useStorefrontStore());
+const { initiateStorefrontCheckout } = useStorefrontStore();
+
+const { renderImg, formatNumber, createAndClickAnchor } = useString();
+
 const zambianProvinces = ref([...zambiaProvinceList]);
+const storeOrdersStorageKey = "storeOrders";
+const phoneCountryCode = ref<string>("260");
+
+const checkoutPayload = ref({
+  firstName: "",
+  lastName: "",
+  email: "",
+  phoneNumber: "",
+  addressLine1: "",
+  addressLine2: "",
+  state: "",
+  postalCode: "",
+});
+
+const selectedPaymentMethod = ref<string>("card");
 
 const couponPayload = ref({
   couponCode: "",
@@ -250,12 +302,14 @@ const shippingPayload = ref({
 const paymentMethods = ref([
   {
     title: "Payment via Card",
+    slug: "card",
     description:
       "Fast, secure, and seamless card payments for your convenience",
     isActive: true,
   },
   {
     title: "Payment via Mobile Money",
+    slug: "mobilemoney",
     description:
       "Fast, secure, and seamless mobile money payments for your convenience",
     isActive: false,
@@ -263,7 +317,8 @@ const paymentMethods = ref([
 ]);
 
 const getProductCurrency = computed(() => {
-  return getProductsInCart.value[0]?.currency ?? "ZK";
+  // return getProductsInCart.value[0]?.currency ?? "ZK";
+  return "ZK";
 });
 
 const getSubTotal = computed(() => {
@@ -287,10 +342,104 @@ const toggleActivePayment = (index: number) => {
     ...payment,
     isActive: i === index,
   }));
+
+  selectedPaymentMethod.value =
+    paymentMethods.value.find((payment) => payment.isActive)?.slug ??
+    "mobilemoney";
 };
 
-const handleMakePayment = () => {
-  // TODO: Implement payment logic
+const isActionReady = computed(() => {
+  return checkoutPayload.value.firstName &&
+    checkoutPayload.value.lastName &&
+    checkoutPayload.value.email &&
+    checkoutPayload.value.phoneNumber &&
+    checkoutPayload.value.addressLine1 &&
+    checkoutPayload.value.state &&
+    checkoutPayload.value.postalCode &&
+    getTotalProductAmount.value > 0
+    ? false
+    : true;
+});
+
+const getCheckoutPayload = computed(() => {
+  return {
+    currency: "ZMW",
+    country: "ZM",
+    narration: "Product payment",
+    method: selectedPaymentMethod.value,
+    amount: getTotalProductAmount.value,
+    redirect_url: `https://store.redstonepgs.com/${getStoreDetails.value?.slug}/checkout-success`,
+    email: checkoutPayload.value.email,
+    customer_first_name: checkoutPayload.value.firstName,
+    customer_last_name: checkoutPayload.value.lastName,
+    phone_number: phoneCountryCode.value + checkoutPayload.value.phoneNumber,
+  };
+});
+
+const persistStoreOrders = () => {
+  // CLEAR OUR ALL PREVIOUS CHECKOUT ORDERS
+  removeStorage(storeOrdersStorageKey);
+
+  // CREATE A NEW CHECKOUT ORDER PAYLOAD
+  let storeOrderPayload = {
+    user_id: uuidv4(),
+    amount: getTotalProductAmount.value,
+    address: checkoutPayload.value.addressLine1,
+    payment_reference: null,
+    payment_method: selectedPaymentMethod.value,
+    currency: "ZMW",
+    status: "pending",
+    store_id: getStoreDetails.value?.id,
+    customer: {
+      email: checkoutPayload.value.email,
+      phone_number: phoneCountryCode.value + checkoutPayload.value.phoneNumber,
+      firstname: checkoutPayload.value.firstName,
+      lastname: checkoutPayload.value.lastName,
+    },
+  };
+
+  let products = getProductsInCart.value.map((product) => {
+    return {
+      product_id: product.id,
+      price: product.amount,
+      quantity: product.quantityInCart,
+    };
+  });
+
+  setStorage({
+    storage_name: storeOrdersStorageKey,
+    storage_value: { ...storeOrderPayload, details: products },
+    storage_type: "object",
+  });
+};
+
+const handleMakePayment = async () => {
+  eventBus?.emit("showPageLoader");
+
+  const response = await processAPIRequest({
+    action: initiateStorefrontCheckout,
+    payload: {
+      payload: getCheckoutPayload.value,
+      businessId: getStoreDetails.value?.business_id,
+    },
+    showAlert: false,
+  });
+
+  if (response.code === 200) {
+    persistStoreOrders(); // PERSIST OUR CHECKOUT ORDERS
+    createAndClickAnchor(response.data.payment_link);
+  }
+
+  // HANDLE ERROR RESPONSE
+  else {
+    eventBus?.emit("hidePageLoader");
+
+    pushToastAlert({
+      message: "Checkout failed",
+      description: "Unable to process your payment. Please try again later.",
+      type: "error",
+    });
+  }
 };
 
 onMounted(() => {

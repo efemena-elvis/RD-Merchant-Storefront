@@ -23,7 +23,7 @@ const templateRoutes: IRouteType[] = [
       },
 
       {
-        path: "/store-checkout",
+        path: "/:storefrontName/store-checkout",
         name: "storefrontCheckout",
         component: () =>
           import(
@@ -32,6 +32,19 @@ const templateRoutes: IRouteType[] = [
         meta: {
           open: true,
           title: "Storefront Checkout",
+        },
+      },
+
+      {
+        path: "/:storefrontName/checkout-success",
+        name: "storefrontCheckoutSuccess",
+        component: () =>
+          import(
+            /* webpackChunkName: "template-module" */ "@/modules/template/pages/storefront-checkout-success.vue"
+          ),
+        meta: {
+          open: true,
+          title: "Storefront Checkout Success",
         },
       },
     ],

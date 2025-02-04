@@ -121,9 +121,6 @@ const toggleIsFavourite = () => {
   pushToastAlert({
     type: inWishList.value ? "error" : "success",
     message: inWishList.value ? "Removed from Wishlist" : "Added to Wishlist",
-    description: inWishList.value
-      ? `${props.product.name} is out of your wishlist`
-      : `${props.product.name} is now in your wishlist`,
   });
 
   toggleProductInWishlist(props.product);
@@ -133,7 +130,6 @@ const addToCart = () => {
   pushToastAlert({
     type: "success",
     message: "Added to Cart",
-    description: `${props.product.name} is now in your cart`,
   });
 
   toggleProductInCart(props.product);

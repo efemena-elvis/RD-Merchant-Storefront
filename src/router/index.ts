@@ -9,6 +9,7 @@ const routes = [
   ...templateRoutes,
   ...externalRoutes,
   {
+    // path: "/",
     path: "/*",
     alias: "/:pathMatch(.*)*",
     name: "NotFoundError",

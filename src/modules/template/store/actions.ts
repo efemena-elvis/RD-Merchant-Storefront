@@ -8,9 +8,9 @@ const { populateStoreDetails, populateStoreProducts } =
   useStorefrontMutations();
 
 export const getStorefrontBySlug = async (payload: any): Promise<IAPIType> => {
-  const response: any = await $api
-    .setBaseAPI(nameSpace)
-    .fetch(`${storeRoutes.getStorefront}/?slug=${payload.storefrontSlug}`);
+  const response: any = await $api.fetch(
+    `${storeRoutes.getStorefront}?slug=${payload.storefrontSlug}`
+  );
 
   if (response.code === 200) populateStoreDetails(response.data);
 
@@ -20,11 +20,27 @@ export const getStorefrontBySlug = async (payload: any): Promise<IAPIType> => {
 export const getStorefrontProducts = async (
   payload: any
 ): Promise<IAPIType> => {
-  const response: any = await $api
-    .setBaseAPI(nameSpace)
-    .fetch(`${storeRoutes.getStoreProducts}?slug=${payload.storefrontSlug}`);
+  const response: any = await $api.fetch(
+    `${storeRoutes.getStoreProducts}?slug=${payload.storefrontSlug}`
+  );
 
   if (response.code === 200) populateStoreProducts(response.data);
 
   return response;
+};
+
+export const initiateStorefrontCheckout = async ({
+  payload,
+  businessId,
+}: any) => {
+  return await $api.push(`${storeRoutes.initiateCheckout}`, {
+    payload,
+    customHeaders: { "business-id": businessId },
+  });
+};
+
+export const placeStorefrontCheckoutOrder = async (payload: any) => {
+  return await $api.push(`${storeRoutes.placeCheckoutOrder}`, {
+    payload,
+  });
 };

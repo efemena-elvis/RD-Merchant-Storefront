@@ -65,13 +65,14 @@ import { storeToRefs } from "pinia";
 const router = useRouter();
 const $emit = defineEmits(["closeTriggered"]);
 
-const { getProductsInCart } = storeToRefs(useStorefrontStore());
+const { getStoreDetails, getProductsInCart } =
+  storeToRefs(useStorefrontStore());
 
 const cartIsLoading = ref<boolean>(true);
 
 const goToCheckout = () => {
   $emit("closeTriggered");
-  router.push("/store-checkout");
+  router.push(`/${getStoreDetails.value?.slug}/store-checkout`);
 };
 
 onMounted(() => {

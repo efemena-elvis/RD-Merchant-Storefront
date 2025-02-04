@@ -20,7 +20,7 @@ withDefaults(defineProps<{ title: string }>(), {
 
 <style lang="scss" scoped>
 .checkout-card {
-  @apply w-full h-auto mb-8 rounded-md overflow-hidden border border-grey-200/80;
+  @apply w-full h-auto mb-8 rounded-md border border-grey-200/80;
 
   &--header {
     @apply w-full h-auto px-6 lg:px-4 py-5 sm:py-[18px] bg-grey-100/40 border-b border-b-grey-200/80;

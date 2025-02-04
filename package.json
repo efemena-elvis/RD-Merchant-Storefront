@@ -18,9 +18,11 @@
     "core-js": "^3.8.3",
     "mitt": "^3.0.1",
     "pinia": "^2.2.2",
+    "uuid": "^11.0.5",
     "vue": "^3.2.13",
     "vue-chartjs": "^5.3.1",
     "vue-router": "^4.0.3",
+    "vue3-uuid": "^1.0.0",
     "vuex": "^4.0.0"
   },
   "devDependencies": {

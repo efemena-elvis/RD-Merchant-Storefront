@@ -29,12 +29,12 @@
     <div class="base-navbar">
       <div class="app-container">
         <div class="nav-row">
-          <div class="nav-item">
+          <!-- <div class="nav-item">
             <div class="nav-item--top">
               <div class="icon icon-user"></div>
             </div>
             <div class="nav-item--bottom">Account</div>
-          </div>
+          </div> -->
 
           <div class="nav-item" @click="toggleOrdersDialog">
             <div class="nav-item--top">
@@ -75,10 +75,8 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, ref, watch } from "vue";
-import { Emitter } from "mitt";
-import { useRoute, useRouter } from "vue-router";
-import useEvents from "@/shared/composables/useEvents";
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import CategoryRow from "@/modules/template/components/template-comp-one/category-row.vue";
 import HeroBanner from "@/modules/template/components/template-comp-one/hero-banner.vue";
 import ProductRow from "@/modules/template/components/template-comp-one/product-row.vue";
@@ -91,25 +89,13 @@ import OrdersDialog from "@/modules/template/dialogs/template-dialog-one/orders-
 import { useStorefrontStore } from "@/modules/template/store";
 import { storeToRefs } from "pinia";
 
-type Events = {
-  hidePageLoader: void;
-  showPageLoader: void;
-};
-
-const eventBus = inject<Emitter<Events>>("eventBus");
-
 const route = useRoute();
-const router = useRouter();
-
-const { processAPIRequest } = useEvents();
 
 const isProductLoading = ref<boolean>(true);
 const productSectionTitle = ref<string>("All Products");
 
 const { getProductCategories, getStoreProducts } =
   storeToRefs(useStorefrontStore());
-
-const { getStorefrontBySlug, getStorefrontProducts } = useStorefrontStore();
 
 const showCartDialog = ref<boolean>(false);
 const showSavedDialog = ref<boolean>(false);
@@ -126,6 +112,20 @@ const toggleSavedDialog = () => {
 const toggleOrdersDialog = () => {
   showOrdersDialog.value = !showOrdersDialog.value;
 };
+
+watch(
+  () => [getProductCategories.value, getStoreProducts.value],
+  ([categories, products]) => {
+    if (categories.length && products.length) {
+      isProductLoading.value = false;
+    } else if (!categories.length && !products.length) {
+      isProductLoading.value = false;
+    } else {
+      isProductLoading.value = true;
+    }
+  },
+  { immediate: true }
+);
 
 watch(
   () => route.query,
@@ -152,41 +152,6 @@ watch(
     }, 1000);
   }
 );
-
-const fetchAllStorefrontProducts = async () => {
-  isProductLoading.value = true;
-
-  const response = await processAPIRequest({
-    action: getStorefrontProducts,
-    payload: { storefrontSlug: route.params.storefrontName },
-    showAlert: false,
-  });
-
-  if (response.code === 200) {
-    isProductLoading.value = false;
-  }
-};
-
-// FETCH STOREFRONT DETAILS
-const fetchStorefrontDetails = async () => {
-  eventBus?.emit("showPageLoader");
-
-  const response = await processAPIRequest({
-    action: getStorefrontBySlug,
-    payload: { storefrontSlug: route.params.storefrontName },
-    showAlert: false,
-  });
-
-  if (response.code === 200) {
-    fetchAllStorefrontProducts();
-    eventBus?.emit("hidePageLoader");
-  }
-
-  // REDIRECT_TO_AN ERROR_PAGE
-  else router.push({ path: "/" });
-};
-
-fetchStorefrontDetails();
 </script>
 
 <style lang="scss" scoped>
