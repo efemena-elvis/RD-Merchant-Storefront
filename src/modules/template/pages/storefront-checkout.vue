@@ -402,7 +402,7 @@ const persistStoreOrders = () => {
     return {
       product_id: product.id,
       price: product.amount,
-      quantity: product.quantityInCart,
+      quantity: product.quantityInCart === 0 ? 1 : product.quantityInCart,
     };
   });
 
