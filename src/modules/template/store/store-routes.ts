@@ -5,4 +5,5 @@ export const storeRoutes = {
   getStoreProducts: "product/store",
   initiateCheckout: "payment/store",
   placeCheckoutOrder: "orders/checkout",
+  searchProducts: "product/search",
 };

@@ -52,7 +52,7 @@ export function useStorefrontMutations() {
     if (cartProducts.some((item) => item.id === product.id)) {
       cartProducts.splice(cartProducts.indexOf(product), 1);
     } else {
-      cartProducts.push(product);
+      cartProducts.push({ ...product, quantityInCart: 1 });
     }
   };
 

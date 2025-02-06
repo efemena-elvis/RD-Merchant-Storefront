@@ -44,3 +44,13 @@ export const placeStorefrontCheckoutOrder = async (payload: any) => {
     payload,
   });
 };
+
+export const searchStorefrontProducts = async (payload: any) => {
+  const response: any = await $api.fetch(
+    `${storeRoutes.searchProducts}?slug=${payload.storefrontSlug}&keywords=${payload.keywords}`
+  );
+
+  if (response.code === 200) populateStoreProducts(response.data);
+
+  return response;
+};

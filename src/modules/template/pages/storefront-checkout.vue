@@ -430,6 +430,17 @@ const handleMakePayment = async () => {
     createAndClickAnchor(response.data.payment_link);
   }
 
+  // HANDLE UNIDENTIFIED MOBILE OPERATOR
+  else if (response.code === 400 && response.message === "Unknown Operator") {
+    eventBus?.emit("hidePageLoader");
+
+    pushToastAlert({
+      message: "Unknown Mobile Operator",
+      description: "Please check phone number and try again",
+      type: "error",
+    });
+  }
+
   // HANDLE ERROR RESPONSE
   else {
     eventBus?.emit("hidePageLoader");

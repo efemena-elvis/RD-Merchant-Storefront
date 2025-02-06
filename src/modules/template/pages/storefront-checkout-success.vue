@@ -163,7 +163,8 @@ const processCheckoutOrder = async (orderPayload: object) => {
     const currentOrderDate = new Date();
 
     // POPULATE ORDER DETAILS
-    orderDetails.value.order_number = response.data.order_details[0].order_id;
+    orderDetails.value.order_number =
+      response.data?.order_number || response.data.order_details[0].order_id;
     orderDetails.value.date_ordered = getOrderDate(currentOrderDate);
     orderDetails.value.payment_method =
       response.data.payment_method ?? "Mobile Money";

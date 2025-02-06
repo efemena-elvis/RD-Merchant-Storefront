@@ -77,6 +77,7 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import useEvents from "@/shared/composables/useEvents";
 import CategoryRow from "@/modules/template/components/template-comp-one/category-row.vue";
 import HeroBanner from "@/modules/template/components/template-comp-one/hero-banner.vue";
 import ProductRow from "@/modules/template/components/template-comp-one/product-row.vue";
@@ -90,12 +91,15 @@ import { useStorefrontStore } from "@/modules/template/store";
 import { storeToRefs } from "pinia";
 
 const route = useRoute();
+const { processAPIRequest } = useEvents();
 
 const isProductLoading = ref<boolean>(true);
 const productSectionTitle = ref<string>("All Products");
 
-const { getProductCategories, getStoreProducts } =
+const { getProductCategories, getStoreProducts, getStoreDetails } =
   storeToRefs(useStorefrontStore());
+const { searchStorefrontProducts, getStorefrontProducts } =
+  useStorefrontStore();
 
 const showCartDialog = ref<boolean>(false);
 const showSavedDialog = ref<boolean>(false);
@@ -111,6 +115,33 @@ const toggleSavedDialog = () => {
 
 const toggleOrdersDialog = () => {
   showOrdersDialog.value = !showOrdersDialog.value;
+};
+
+const searchStoreProducts = async (searchValue: string) => {
+  const response = await processAPIRequest({
+    action: searchStorefrontProducts,
+    payload: {
+      storefrontSlug: getStoreDetails.value?.slug,
+      keywords: searchValue,
+    },
+    showAlert: false,
+  });
+
+  if (response.code === 200) {
+    isProductLoading.value = false;
+  }
+};
+
+const fetchAllStoreProducts = async () => {
+  const response = await processAPIRequest({
+    action: getStorefrontProducts,
+    payload: { storefrontSlug: getStoreDetails.value?.slug },
+    showAlert: false,
+  });
+
+  if (response.code === 200) {
+    isProductLoading.value = false;
+  }
 };
 
 watch(
@@ -130,6 +161,8 @@ watch(
 watch(
   () => route.query,
   (value) => {
+    isProductLoading.value = true;
+
     // HANDLE SEARCH QUERY
     if (value.search) {
       productSectionTitle.value = `Search Results for "${value.search}"`;
@@ -145,11 +178,14 @@ watch(
       productSectionTitle.value = "All Products";
     }
 
-    isProductLoading.value = true;
+    if (Object.keys(value).length) {
+      const searchValue = value.search;
+      const categoryValue = (value.category as string)?.split("-").join(" ");
 
-    setTimeout(() => {
-      isProductLoading.value = false;
-    }, 1000);
+      searchStoreProducts((searchValue || categoryValue) as string);
+    } else {
+      fetchAllStoreProducts();
+    }
   }
 );
 </script>
