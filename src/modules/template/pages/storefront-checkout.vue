@@ -300,13 +300,13 @@ const shippingPayload = ref({
 });
 
 const paymentMethods = ref([
-  // {
-  //   title: "Payment via Card",
-  //   slug: "card",
-  //   description:
-  //     "Fast, secure, and seamless card payments for your convenience",
-  //   isActive: true,
-  // },
+  {
+    title: "Payment via Card",
+    slug: "card",
+    description:
+      "Fast, secure, and seamless card payments for your convenience",
+    isActive: false,
+  },
   {
     title: "Payment via Mobile Money",
     slug: "mobilemoney",
@@ -425,13 +425,13 @@ const handleMakePayment = async () => {
     showAlert: false,
   });
 
-  if (response.code === 200) {
+  if (response?.code === 200) {
     persistStoreOrders(); // PERSIST OUR CHECKOUT ORDERS
     createAndClickAnchor(response.data.payment_link);
   }
 
   // HANDLE UNIDENTIFIED MOBILE OPERATOR
-  else if (response.code === 400 && response.message === "Unknown Operator") {
+  else if (response?.code === 400 && response?.message === "Unknown Operator") {
     eventBus?.emit("hidePageLoader");
 
     pushToastAlert({

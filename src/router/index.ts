@@ -17,6 +17,7 @@ const routes = [
       import(
         /* webpackChunkName: "errorRoute" */
         "@/modules/error/pages/not-found.vue"
+    
       ),
     meta: {
       guest: true,
