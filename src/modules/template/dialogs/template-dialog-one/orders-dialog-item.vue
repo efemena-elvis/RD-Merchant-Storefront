@@ -12,7 +12,7 @@
         <div class="item-info">
           <div class="product-title">Breville One Hand Blender</div>
           <div class="product-meta">
-            <div class="amount">ZK20.00</div>
+            <div class="amount">ZMW20.00</div>
             <div class="dot"></div>
             <div class="quantity">1 UNIT</div>
           </div>

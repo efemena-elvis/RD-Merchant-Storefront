@@ -164,7 +164,7 @@
                   <div class="title-text">Your cart is empty</div>
 
                   <div class="description-text">
-                    Look like you haven't added anything to your cart yet.
+                    Looks like you haven't added anything to your cart yet.
                   </div>
                 </div>
               </template>
@@ -185,7 +185,7 @@
 
             <!-- PRODUCT SUMMATION BLOCK -->
             <div class="summation-block">
-              <div class="secondary-total border-b border-b-grey-200/75">
+              <div class="border-b secondary-total border-b-grey-200/75">
                 <div class="total-row">
                   <div class="text">Subtotal</div>
                   <div class="value">
@@ -211,9 +211,9 @@
                 </div>
               </div>
 
-              <div class="primary-total pt-5 pb-4">
+              <div class="pt-5 pb-4 primary-total">
                 <div class="total-row">
-                  <div class="text font-semibold">Total</div>
+                  <div class="font-semibold text">Total</div>
                   <div class="value !text-green-600">
                     <span class="mr-0.5">{{ getProductCurrency }}</span
                     ><span>{{ formatNumber(getTotalProductAmount) }}</span>
@@ -318,7 +318,7 @@ const paymentMethods = ref([
 
 const getProductCurrency = computed(() => {
   // return getProductsInCart.value[0]?.currency ?? "ZK";
-  return "ZK";
+  return "ZMW";
 });
 
 const getSubTotal = computed(() => {
