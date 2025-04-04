@@ -127,10 +127,10 @@ const toggleIsFavourite = () => {
 };
 
 const addToCart = () => {
-  pushToastAlert({
-    type: "success",
-    message: "Added to Cart",
-  });
+  // pushToastAlert({
+  //   type: "success",
+  //   message: "Added to Cart",
+  // });
 
   toggleProductInCart(props.product);
 };

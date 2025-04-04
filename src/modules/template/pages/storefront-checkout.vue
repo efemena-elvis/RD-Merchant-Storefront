@@ -300,13 +300,13 @@ const shippingPayload = ref({
 });
 
 const paymentMethods = ref([
-  // {
-  //   title: "Payment via Card",
-  //   slug: "card",
-  //   description:
-  //     "Fast, secure, and seamless card payments for your convenience",
-  //   isActive: true,
-  // },
+  {
+    title: "Payment via Card",
+    slug: "card",
+    description:
+      "Fast, secure, and seamless card payments for your convenience",
+    isActive: false,
+  },
   {
     title: "Payment via Mobile Money",
     slug: "mobilemoney",
