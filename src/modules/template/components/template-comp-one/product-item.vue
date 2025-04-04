@@ -24,7 +24,7 @@
       <!-- PRODUCT META -->
       <div class="product-meta">
         <div class="product-amount">
-          <span class="mr-0.5">ZK</span
+          <span class="mr-0.5">ZMW</span
           ><span>{{ formatNumber(product.amount) }}</span>
         </div>
 

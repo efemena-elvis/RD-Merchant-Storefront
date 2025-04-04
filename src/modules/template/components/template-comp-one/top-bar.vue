@@ -75,7 +75,7 @@
         <div class="back-button" @click="navigateToStorefront">
           <div class="icon icon-arrow-left"></div>
           <div class="text xs:hidden">Back to Storefront</div>
-          <div class="text hidden xs:block">Storefront</div>
+          <div class="hidden text xs:block">Storefront</div>
         </div>
       </template>
     </div>
