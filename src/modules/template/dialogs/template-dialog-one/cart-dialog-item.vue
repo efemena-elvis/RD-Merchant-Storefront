@@ -10,7 +10,7 @@
           <div class="product-title">{{ product.name }}</div>
           <div class="product-meta">
             <div class="amount">
-              <span class="mr-0.5">ZK</span
+              <span class="mr-0.5">ZMW</span
               ><span>{{ formatNumber(product.amount) }}</span>
             </div>
             <div class="dot"></div>
