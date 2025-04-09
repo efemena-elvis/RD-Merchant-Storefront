@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import { inject } from "vue";
+import { computed, inject, ref } from "vue";
 import { Emitter } from "mitt";
 import { useRoute, useRouter } from "vue-router";
 import useEvents from "@/shared/composables/useEvents";
@@ -33,12 +33,31 @@ const router = useRouter();
 
 const { processAPIRequest } = useEvents();
 
-const { getStorefrontBySlug, getStorefrontProducts } = useStorefrontStore();
+const { getStorefrontDetails, getStorefrontProducts } = useStorefrontStore();
+
+const defaultStorefrontDomain = ref<string>("store.redstonepgs.com");
+
+const getCurrentBaseDomain = computed(() => window.location.origin);
+
+const getStorefrontPayload = computed(() => {
+  if (
+    defaultStorefrontDomain.value === getCurrentBaseDomain.value ||
+    getCurrentBaseDomain.value === "http://localhost:8010"
+  ) {
+    return {
+      slug: route.params.storefrontName,
+    };
+  } else {
+    return {
+      domaian: getCurrentBaseDomain.value,
+    };
+  }
+});
 
 const fetchAllStorefrontProducts = async () => {
   await processAPIRequest({
     action: getStorefrontProducts,
-    payload: { storefrontSlug: route.params.storefrontName },
+    payload: getStorefrontPayload.value,
     showAlert: false,
   });
 };
@@ -48,8 +67,8 @@ const fetchStorefrontDetails = async () => {
   eventBus?.emit("showPageLoader");
 
   const response = await processAPIRequest({
-    action: getStorefrontBySlug,
-    payload: { storefrontSlug: route.params.storefrontName },
+    action: getStorefrontDetails,
+    payload: getStorefrontPayload.value,
     showAlert: false,
   });
 
@@ -59,10 +78,14 @@ const fetchStorefrontDetails = async () => {
   }
 
   // REDIRECT_TO_AN ERROR_PAGE
-  else router.push({ path: "/" });
+  else {
+    eventBus?.emit("hidePageLoader");
+    router.push({ name: "NotFoundError" });
+  }
 };
 
 fetchStorefrontDetails();
+
 </script>
 
 <style lang="css" scoped></style>

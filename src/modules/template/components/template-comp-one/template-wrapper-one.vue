@@ -89,6 +89,7 @@ import SavedDialog from "@/modules/template/dialogs/template-dialog-one/saved-di
 import OrdersDialog from "@/modules/template/dialogs/template-dialog-one/orders-dialog.vue";
 import { useStorefrontStore } from "@/modules/template/store";
 import { storeToRefs } from "pinia";
+import { computed } from "vue";
 
 const route = useRoute();
 const { processAPIRequest } = useEvents();
@@ -96,6 +97,25 @@ const { processAPIRequest } = useEvents();
 const isProductLoading = ref<boolean>(true);
 const productSectionTitle = ref<string>("All Products");
 
+const defaultStorefrontDomain = ref<string>("store.redstonepgs.com");
+
+const getCurrentBaseDomain = computed(() => window.location.origin);
+
+const getStorefrontPayload = computed(() => {
+  if (
+    defaultStorefrontDomain.value === getCurrentBaseDomain.value ||
+    getCurrentBaseDomain.value === "http://localhost:8010"
+  ) {
+    return {
+      slug: route.params.storefrontName,
+    };
+  } else {
+    return {
+      domaian: getCurrentBaseDomain.value,
+    };
+  }
+});
+const storefrontPayload =getStorefrontPayload.value;
 const { getProductCategories, getStoreProducts, getStoreDetails } =
   storeToRefs(useStorefrontStore());
 const { searchStorefrontProducts, getStorefrontProducts } =
@@ -121,7 +141,7 @@ const searchStoreProducts = async (searchValue: string) => {
   const response = await processAPIRequest({
     action: searchStorefrontProducts,
     payload: {
-      storefrontSlug: getStoreDetails.value?.slug,
+      storefrontPayload,
       keywords: searchValue,
     },
     showAlert: false,
@@ -135,7 +155,7 @@ const searchStoreProducts = async (searchValue: string) => {
 const fetchAllStoreProducts = async () => {
   const response = await processAPIRequest({
     action: getStorefrontProducts,
-    payload: { storefrontSlug: getStoreDetails.value?.slug },
+    payload: { slug: getStoreDetails.value?.slug },
     showAlert: false,
   });
 

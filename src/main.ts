@@ -14,7 +14,11 @@ const pinia = createPinia();
 const head = createHead();
 const eventBus = mitt();
 
-app.provide("eventBus", eventBus); // Provide the event bus
+
+// const host = window.location.hostname;
+
+
+app.provide("eventBus", eventBus); 
 
 app.use(head);
 app.use(pinia);

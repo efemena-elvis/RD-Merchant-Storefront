@@ -10,7 +10,7 @@ const routes = [
   ...externalRoutes,
   {
     // path: "/",
-    path: "/*",
+    path: "/not-found",
     alias: "/:pathMatch(.*)*",
     name: "NotFoundError",
     component: () =>
