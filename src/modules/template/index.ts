@@ -2,8 +2,11 @@ import { IRouteType } from "@/models/route-type";
 
 // *********** STOREFRONT TEMPLATE ROUTES *********** //
 const templateRoutes: IRouteType[] = [
+
+
   {
-    path: "/:storefrontName",
+
+    path: "/",
     component: () =>
       import(
         /* webpackChunkName: "template-module" */ "@/modules/template/layouts/template-layout-one.vue"
@@ -11,6 +14,19 @@ const templateRoutes: IRouteType[] = [
     children: [
       {
         path: "",
+        name: "customDomainStorefrontHome",
+        component: () =>
+          import(
+            /* webpackChunkName: "template-module" */ "@/modules/template/pages/storefront-home.vue"
+          ),
+        meta: {
+          open: true,
+          title: "Storefront",
+        },
+      },
+
+      {
+        path: "/:storefrontName",
         name: "storefrontHome",
         component: () =>
           import(
