@@ -3,40 +3,17 @@ import { useStorefrontMutations } from "./mutations";
 import { storeRoutes } from "./store-routes";
 import { IAPIType } from "@/models/api-type";
 
-const nameSpace: string = "storefront";
-
 const { populateStoreDetails, populateStoreProducts } =
   useStorefrontMutations();
 
-
-  // const resolveStorefrontSlug = (): string => {
-  //   if (typeof window === "undefined") return ""; 
-  
-  //   const { hostname, pathname } = window.location;
-  
-
-  //   const pathParts = pathname.split("/").filter(Boolean);
-  //   if (pathParts.length > 0) {
-  //     return pathParts[0];
-  //   }
-  
-
-  //   const domainParts = hostname.split(".");
-  //   const possibleSlug = domainParts[0];
-  
-  //   return possibleSlug;
-  // };
-  
-  
-  // const storefrontSlug = resolveStorefrontSlug();
+const getQueryParam = (payload: any) => {
+  return payload.domain ? `domain=${payload.domain} ` : `slug=${payload.slug}`;
+};
 
 export const getStorefrontDetails = async (payload: any): Promise<IAPIType> => {
-
-const queryParameter = payload.domain ? `?domain=${payload.domain} ` : `?slug=${payload.slug}`
   const response: any = await $api.fetch(
-    `${storeRoutes.getStorefront}${queryParameter}`
+    `${storeRoutes.getStorefront}?${getQueryParam(payload)}`
   );
-  // console.log(response.data)
 
   if (response.code === 200) populateStoreDetails(response.data);
 
@@ -46,9 +23,8 @@ const queryParameter = payload.domain ? `?domain=${payload.domain} ` : `?slug=${
 export const getStorefrontProducts = async (
   payload: any
 ): Promise<IAPIType> => {
-  const queryParameter = payload.domain ? `?domain=${payload.domain} ` : `?slug=${payload.slug}`
   const response: any = await $api.fetch(
-    `${storeRoutes.getStoreProducts}${queryParameter}`
+    `${storeRoutes.getStoreProducts}?${getQueryParam(payload)}`
   );
 
   if (response.code === 200) populateStoreProducts(response.data);
@@ -73,9 +49,8 @@ export const placeStorefrontCheckoutOrder = async (payload: any) => {
 };
 
 export const searchStorefrontProducts = async (payload: any) => {
-  const queryParameter = payload.domain ? `?domain=${payload.domain} ` : `?slug=${payload.slug}`
   const response: any = await $api.fetch(
-    `${storeRoutes.searchProducts}${queryParameter}&keywords=${payload.keywords}`
+    `${storeRoutes.searchProducts}?${getQueryParam(payload)}&keywords=${payload.keywords}`
   );
 
   if (response.code === 200) populateStoreProducts(response.data);

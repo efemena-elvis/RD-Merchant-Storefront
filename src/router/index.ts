@@ -9,15 +9,13 @@ const routes = [
   ...templateRoutes,
   ...externalRoutes,
   {
-    // path: "/",
     path: "/not-found",
-    alias: "/:pathMatch(.*)*",
+    // alias: "/:pathMatch(.*)*",
     name: "NotFoundError",
     component: () =>
       import(
         /* webpackChunkName: "errorRoute" */
         "@/modules/error/pages/not-found.vue"
-    
       ),
     meta: {
       guest: true,

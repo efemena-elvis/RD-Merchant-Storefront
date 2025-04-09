@@ -16,6 +16,8 @@ export interface IConstants {
   REDSTONE_API_VERSION: string;
   STOREFRONT_API_URL: string;
   REDSTONE_STOREFRONT_TOKEN: string;
+  LOCAL_DOMAIN: string;
+  IS_LOCAL_HOST: boolean;
 }
 
 const constants: IConstants = {
@@ -28,6 +30,8 @@ const constants: IConstants = {
   REDSTONE_API_VERSION: API_VERSION,
   STOREFRONT_API_URL: STOREFRONT_API_BASE_URL,
   REDSTONE_STOREFRONT_TOKEN: "REDSTONE_STOREFRONT_TOKEN",
+  LOCAL_DOMAIN: LOCAL_DOMAIN,
+  IS_LOCAL_HOST: IS_LOCAL_HOST,
 };
 
 export default constants;

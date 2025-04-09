@@ -13,13 +13,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, onMounted, watch } from "vue";
 import { Emitter } from "mitt";
 import { useRoute, useRouter } from "vue-router";
+import { useStorefrontStore } from "@/modules/template/store";
 import useEvents from "@/shared/composables/useEvents";
 import TopBar from "@/modules/template/components/template-comp-one/top-bar.vue";
 import Footer from "@/modules/template/components/template-comp-one/footer.vue";
-import { useStorefrontStore } from "@/modules/template/store";
+import constants from "@/utilities/constants";
 
 type Events = {
   hidePageLoader: void;
@@ -32,60 +33,60 @@ const route = useRoute();
 const router = useRouter();
 
 const { processAPIRequest } = useEvents();
-
 const { getStorefrontDetails, getStorefrontProducts } = useStorefrontStore();
 
-const defaultStorefrontDomain = ref<string>("store.redstonepgs.com");
+const storefrontHostname = ref<string>("https://store.redstonepgs.com");
 
-const getCurrentBaseDomain = computed(() => window.location.origin);
-
-const getStorefrontPayload = computed(() => {
-  if (
-    defaultStorefrontDomain.value === getCurrentBaseDomain.value ||
-    getCurrentBaseDomain.value === "http://localhost:8010"
-  ) {
-    return {
-      slug: route.params.storefrontName,
-    };
-  } else {
-    return {
-      domaian: getCurrentBaseDomain.value,
-    };
-  }
-});
-
-const fetchAllStorefrontProducts = async () => {
+const fetchAllStorefrontProducts = async (payload: any) => {
   await processAPIRequest({
     action: getStorefrontProducts,
-    payload: getStorefrontPayload.value,
+    payload,
     showAlert: false,
   });
 };
 
 // FETCH STOREFRONT DETAILS
-const fetchStorefrontDetails = async () => {
+const fetchStorefrontDetails = async (payload: any) => {
   eventBus?.emit("showPageLoader");
 
   const response = await processAPIRequest({
     action: getStorefrontDetails,
-    payload: getStorefrontPayload.value,
+    payload,
     showAlert: false,
   });
 
   if (response.code === 200) {
-    fetchAllStorefrontProducts();
+    fetchAllStorefrontProducts(payload);
     eventBus?.emit("hidePageLoader");
   }
 
   // REDIRECT_TO_AN ERROR_PAGE
   else {
-    eventBus?.emit("hidePageLoader");
     router.push({ name: "NotFoundError" });
   }
 };
 
-fetchStorefrontDetails();
+watch(
+  () => route,
+  () => {
+    const defaultOrigins = [constants.LOCAL_DOMAIN, storefrontHostname.value];
 
+    if (defaultOrigins.includes(location.origin)) {
+      // Check if route param exists
+      if (route.params.storefrontName) {
+        fetchStorefrontDetails({ slug: route.params.storefrontName });
+      }
+      // Redirect to 404 page
+      else {
+        router.push({ name: "NotFoundError" });
+      }
+    } else {
+      console.log("HIT 1");
+      fetchStorefrontDetails({ domain: location.hostname });
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style lang="css" scoped></style>
