@@ -3,7 +3,7 @@ const API_BASE_URL = process.env.VUE_APP_REDSTONE_API_BASE_URL;
 const API_VERSION = process.env.VUE_APP_REDSTONE_API_VERSION;
 const STOREFRONT_API_BASE_URL = process.env.VUE_APP_STOREFRONT_API_BASE_URL;
 
-const LOCAL_DOMAIN = "http://localhost:8065";
+const LOCAL_DOMAIN = "http://localhost:8010";
 const IS_LOCAL_HOST = window.location.hostname === "localhost" ? true : false;
 
 export interface IConstants {
