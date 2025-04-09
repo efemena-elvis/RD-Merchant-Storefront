@@ -141,7 +141,7 @@ const searchStoreProducts = async (searchValue: string) => {
   const response = await processAPIRequest({
     action: searchStorefrontProducts,
     payload: {
-      storefrontPayload,
+      ...storefrontPayload,
       keywords: searchValue,
     },
     showAlert: false,
@@ -155,7 +155,7 @@ const searchStoreProducts = async (searchValue: string) => {
 const fetchAllStoreProducts = async () => {
   const response = await processAPIRequest({
     action: getStorefrontProducts,
-    payload: { slug: getStoreDetails.value?.slug },
+    payload: storefrontPayload,
     showAlert: false,
   });
 
