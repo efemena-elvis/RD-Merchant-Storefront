@@ -97,13 +97,14 @@ const { processAPIRequest } = useEvents();
 const isProductLoading = ref<boolean>(true);
 const productSectionTitle = ref<string>("All Products");
 
-const defaultStorefrontDomain = ref<string>("store.redstonepgs.com");
+const defaultStorefrontDomain = ref<string>("https://store.redstonepgs.com");
 
 const getCurrentBaseDomain = computed(() => window.location.origin);
 
+
 const getStorefrontPayload = computed(() => {
   if (
-    defaultStorefrontDomain.value === getCurrentBaseDomain.value ||
+    getCurrentBaseDomain.value ===  defaultStorefrontDomain.value ||
     getCurrentBaseDomain.value === "http://localhost:8010"
   ) {
     return {
@@ -111,10 +112,11 @@ const getStorefrontPayload = computed(() => {
     };
   } else {
     return {
-      domaian: getCurrentBaseDomain.value,
+      domain: getCurrentBaseDomain.value,
     };
   }
 });
+
 const storefrontPayload =getStorefrontPayload.value;
 const { getProductCategories, getStoreProducts, getStoreDetails } =
   storeToRefs(useStorefrontStore());
