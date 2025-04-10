@@ -9,7 +9,7 @@ const routes = [
   ...templateRoutes,
   ...externalRoutes,
   {
-    path: "/not-found",
+    path: "/store-unavailable",
     // alias: "/:pathMatch(.*)*",
     name: "NotFoundError",
     component: () =>
