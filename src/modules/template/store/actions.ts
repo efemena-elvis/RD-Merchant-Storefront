@@ -8,7 +8,7 @@ const { populateStoreDetails, populateStoreProducts } =
 
 const getQueryParam = (payload: any) => {
   return payload.domain
-    ? `domain=${payload.domain.trim()} `
+    ? `domain=${payload.domain.trim()}`
     : `slug=${payload.slug.trim()}`;
 };
 
