@@ -7,7 +7,9 @@ const { populateStoreDetails, populateStoreProducts } =
   useStorefrontMutations();
 
 const getQueryParam = (payload: any) => {
-  return payload.domain ? `domain=${payload.domain} ` : `slug=${payload.slug}`;
+  return payload.domain
+    ? `domain=${payload.domain.trim()} `
+    : `slug=${payload.slug.trim()}`;
 };
 
 export const getStorefrontDetails = async (payload: any): Promise<IAPIType> => {

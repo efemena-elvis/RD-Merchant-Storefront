@@ -72,13 +72,7 @@ watch(
       "https://store.redstonepgs.com",
     ];
 
-    console.log("HIT 0", location.origin);
-    console.log("HIT 0.1", location.hostname);
-    console.log("HIT 0.2", defaultOrigins);
-
     if (defaultOrigins.includes(location.origin)) {
-      console.log("HIT 1", location.origin);
-
       // Check if route param exists
       if (route.params.storefrontName) {
         fetchStorefrontDetails({ slug: route.params.storefrontName });
@@ -88,8 +82,6 @@ watch(
         router.push({ name: "NotFoundError" });
       }
     } else {
-      console.log("HIT 2", location.origin);
-      console.log("HIT 2", location.hostname);
       fetchStorefrontDetails({ domain: location.hostname });
     }
   },
