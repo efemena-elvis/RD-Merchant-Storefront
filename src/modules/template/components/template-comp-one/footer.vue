@@ -54,7 +54,7 @@
           </a>
 
           <a
-            :href="`https://tiktok.com/${storeDetailsValidated.tikTok}`"
+            :href="`https://tiktok.com/@${storeDetailsValidated.tikTok}`"
             target="_blank"
             class="social-wrapper"
             v-if="storeDetailsValidated.tikTok"
