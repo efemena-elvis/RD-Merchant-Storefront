@@ -102,7 +102,7 @@ const fetchStorefrontDetails = async () => {
 
   const response = await processAPIRequest({
     action: getStorefrontDetails,
-    payload: getStorefrontPayload,
+    payload: getStorefrontPayload.value,
     showAlert: false,
   });
 

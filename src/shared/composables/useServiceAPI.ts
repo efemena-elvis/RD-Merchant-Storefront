@@ -320,7 +320,7 @@ class ServiceApi {
     } else {
       return {
         publicKey: null,
-        secretKey: null,
+        secretKey: null, 
       };
     }
   }
