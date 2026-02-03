@@ -35,42 +35,74 @@ const { processAPIRequest } = useEvents();
 
 const { getStorefrontDetails, getStorefrontProducts } = useStorefrontStore();
 
-const defaultStorefrontDomain = ref<string>("https://store.redstonepgs.com");
+// const defaultStorefrontDomain = ref<string>("https://store.redstonepgs.com");
+
+// const getCurrentBaseDomain = computed(() => window.location.origin);
+
+// const getStorefrontPayload = computed(() => {
+//   if (
+//    getCurrentBaseDomain.value ===  defaultStorefrontDomain.value ||
+//     getCurrentBaseDomain.value === "http://localhost:8010"
+//   ) {
+//     return {
+//       slug: route.params.storefrontName,
+//     };
+//   } else {
+//     return {
+//       domain: getCurrentBaseDomain.value,
+//     };
+//   }
+// });
+
+// const storefrontPayload = getStorefrontPayload.value
+
+// const fetchAllStorefrontProducts = async () => {
+//   await processAPIRequest({
+//     action: getStorefrontProducts,
+//     payload: storefrontPayload,
+//     showAlert: false,
+//   });
+// };
+
+const defaultStorefrontDomain = ref<string>("https://storoapp.com");
 
 const getCurrentBaseDomain = computed(() => window.location.origin);
 
 const getStorefrontPayload = computed(() => {
-  if (
-   getCurrentBaseDomain.value ===  defaultStorefrontDomain.value ||
-    getCurrentBaseDomain.value === "http://localhost:8010"
-  ) {
-    return {
-      slug: route.params.storefrontName,
-    };
-  } else {
-    return {
-      domain: getCurrentBaseDomain.value,
-    };
-  }
-});
+  const origin = getCurrentBaseDomain.value;
+  const baseDomain = new URL(defaultStorefrontDomain.value).hostname; 
+  const currentHost = window.location.hostname; 
 
-const storefrontPayload = getStorefrontPayload.value
+  if (origin === "http://localhost:8010") {
+ 
+    return { slug: route.params.storefrontName || "" };
+  }
+
+  if (currentHost.endsWith(baseDomain)) {
+   
+    const subdomain = currentHost.replace(`.${baseDomain}`, "");
+  
+    return { slug: subdomain };
+  }
+
+  return { domain: origin };
+});
 
 const fetchAllStorefrontProducts = async () => {
   await processAPIRequest({
     action: getStorefrontProducts,
-    payload: storefrontPayload,
+    payload: getStorefrontPayload.value, 
     showAlert: false,
   });
 };
 
-// FETCH STOREFRONT DETAILS
+
 const fetchStorefrontDetails = async () => {
   eventBus?.emit("showPageLoader");
 
   const response = await processAPIRequest({
     action: getStorefrontDetails,
-    payload: storefrontPayload,
+    payload: getStorefrontPayload,
     showAlert: false,
   });
 
