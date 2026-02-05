@@ -373,6 +373,7 @@ const getCheckoutPayload = computed(() => {
     customer_first_name: checkoutPayload.value.firstName,
     customer_last_name: checkoutPayload.value.lastName,
     phone_number: phoneCountryCode.value + checkoutPayload.value.phoneNumber,
+    operator: "tj"
   };
 });
 
