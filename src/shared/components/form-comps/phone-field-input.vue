@@ -223,7 +223,7 @@ useClickOutside(dialogRef, togglerRef, toggleDropdown);
       }
 
       .form-control {
-        @apply pl-[86px] sm:pl-[45px];
+        @apply pl-[86px] sm:pl-[65px];
       }
     }
 

@@ -44,6 +44,9 @@
           </div>
 
           <div class="nav-item" @click="toggleSavedDialog">
+             <div class="option-pill" v-if="getProductsInWishList.length">
+              {{ getProductsInWishList.length }}
+            </div>
             <div class="nav-item--top">
               <div class="icon icon-heart-outline"></div>
             </div>
@@ -51,6 +54,9 @@
           </div>
 
           <div class="nav-item" @click="toggleCartDialog">
+                <div class="option-pill" v-if="getProductsInCart.length">
+              {{ getProductsInCart.length }}
+            </div>
             <div class="nav-item--top">
               <div class="icon icon-shopping-bag"></div>
             </div>
@@ -101,10 +107,9 @@ const defaultStorefrontDomain = ref<string>("https://store.redstonepgs.com");
 
 const getCurrentBaseDomain = computed(() => window.location.origin);
 
-
 const getStorefrontPayload = computed(() => {
   if (
-    getCurrentBaseDomain.value ===  defaultStorefrontDomain.value ||
+    getCurrentBaseDomain.value === defaultStorefrontDomain.value ||
     getCurrentBaseDomain.value === "http://localhost:8010"
   ) {
     return {
@@ -117,8 +122,10 @@ const getStorefrontPayload = computed(() => {
   }
 });
 
-const storefrontPayload =getStorefrontPayload.value;
-const { getProductCategories, getStoreProducts, getStoreDetails } =
+const storefrontPayload = getStorefrontPayload.value;
+const { getProductCategories, getStoreProducts, getStoreDetails,
+  getProductsInCart,
+  getProductsInWishList, } =
   storeToRefs(useStorefrontStore());
 const { searchStorefrontProducts, getStorefrontProducts } =
   useStorefrontStore();
@@ -230,9 +237,14 @@ watch(
             @apply text-[19px] text-grey-600 transition duration-300 ease-in-out;
           }
         }
+        
 
         &--bottom {
           @apply text-[13px]  font-medium text-grey-500 transition duration-300 ease-in-out;
+        }
+
+         .option-pill {
+          @apply absolute -top-2 -right-1 min-w-[18px] w-max h-[18px] py-0.5 px-1 rounded-full bg-green-600 flex justify-center items-center text-[10px] font-semibold text-neutral-10 border;
         }
       }
     }

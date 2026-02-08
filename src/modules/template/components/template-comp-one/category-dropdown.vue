@@ -58,7 +58,7 @@ watch(
   @apply flex-nowrap justify-end items-center hidden mdLg:flex sm:hidden gap-x-1.5 border border-grey-300 px-4 py-0 rounded-3xl w-max transition duration-300 ease-in-out hover:border-green-400;
 
   .form-control {
-    @apply border-0 px-0;
+    @apply   @apply  px-4 outline-none border-transparent;
   }
 
   .icon {

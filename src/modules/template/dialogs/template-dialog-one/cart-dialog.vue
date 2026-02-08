@@ -44,7 +44,7 @@
           class="btn btn-md"
           v-if="getProductsInCart.length"
         >
-          <div class="icon-shopping-cart text-lg"></div>
+          <div class="text-lg icon-shopping-cart"></div>
           Proceed to Checkout
         </button>
       </div>
@@ -71,9 +71,12 @@ const { getStoreDetails, getProductsInCart } =
 const cartIsLoading = ref<boolean>(true);
 
 const goToCheckout = () => {
+console.log(getStoreDetails.value);
   $emit("closeTriggered");
   router.push(`/${getStoreDetails.value?.slug}/store-checkout`);
 };
+
+
 
 onMounted(() => {
   setTimeout(() => {
