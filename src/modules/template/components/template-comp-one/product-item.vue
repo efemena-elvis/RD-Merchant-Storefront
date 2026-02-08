@@ -54,6 +54,14 @@
           <div class="icon icon-checkmark"></div>
           <div class="text">Added to Cart</div>
         </div>
+        
+        <div
+          class="product-action product-action-disabled"
+          v-else-if="product.stock === 0"
+        >
+        
+          <div class="text">Out of Stock</div>
+        </div>
 
         <div class="product-action" v-else @click="addToCart">
           <div class="icon icon-shopping-bag"></div>

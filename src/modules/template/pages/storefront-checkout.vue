@@ -368,6 +368,8 @@ const getCheckoutPayload = computed(() => {
     narration: "Product payment",
     method: selectedPaymentMethod.value,
     amount: getTotalProductAmount.value,
+    redirect_success_url: `https://store.redstonepgs.com/${getStoreDetails.value?.slug}/checkout-success`,
+    redirect_failed_url: `https://store.redstonepgs.com/${getStoreDetails.value?.slug}/checkout-success`,
     redirect_url: `https://store.redstonepgs.com/${getStoreDetails.value?.slug}/checkout-success`,
     email: checkoutPayload.value.email,
     customer_first_name: checkoutPayload.value.firstName,
